@@ -1,0 +1,6 @@
+.vscode/
+*.gbrjob
+*.gbr
+*-bak
+*.drl
+fp-info-cache
