@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include "tracks.h"
 
-#include "../input/buttons.h"
-#include "../output/switches.h"
-#include "../output/switchMapping.h"
-#include "../timer.h"
+#include "../../input/buttons.h"
+#include "../../output/switches.h"
+#include "../../output/switchMapping.h"
+#include "../../timer.h"
 
 void process();
 

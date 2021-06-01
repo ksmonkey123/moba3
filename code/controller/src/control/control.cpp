@@ -1,6 +1,6 @@
 #include "control.h"
 
-#include "tracks.h"
+#include "modules/tracks.h"
 
 void Control::init() {
 }
