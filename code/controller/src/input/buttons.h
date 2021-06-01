@@ -1,3 +1,6 @@
+#ifndef INPUT_BUTTONS_H
+#define INPUT_BUTTONS_H
+
 #include <Arduino.h>
 
 namespace Buttons {
@@ -16,3 +19,5 @@ namespace Buttons {
 }
 
 extern Buttons::ButtonModel _buttons;
+
+#endif

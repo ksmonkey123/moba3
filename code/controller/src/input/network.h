@@ -1,7 +1,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include "settings.h"
+#include "../settings.h"
 
 namespace Network {
     void init();

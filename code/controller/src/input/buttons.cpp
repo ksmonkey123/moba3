@@ -1,5 +1,6 @@
+#include <Arduino.h>
 #include "buttons.h"
-#include "utils.h"
+#include "../utils.h"
 
 Buttons::ButtonModel _buttons = {};
 
@@ -9,6 +10,7 @@ void Buttons::init() {
 
 void Buttons::processInput(char* buffer) {
     if (buffer[0] == 'X' && buffer[1] == 'X' && buffer[2] == 'X') {
+        Serial.println("RESET");
         Buttons::init();
         return;
     }
