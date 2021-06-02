@@ -5,13 +5,23 @@
 
 class Timer {
     public:
-        Timer(unsigned long interval, void(*callback)());
-        void setInterval(unsigned long interval);
-        void tick();
+        Timer();
+        static Timer* create(unsigned long, void(*handler)(Timer*));
+        static void tickTimers();
+
+        void setInterval(unsigned long);
+        void setHandler(void(*handler)(Timer*));
+        void configure(unsigned long, void(*handler)(Timer*));
+
+        void start();
+        void stop();
     private:
-        void (*callback)();
+        void tick();
+
+        boolean enabled;
+        void (*handler)(Timer*);
         unsigned long interval;
-        unsigned long nextExpiration;
+        unsigned long lastTime;
 };
 
 #endif

@@ -3,7 +3,6 @@
 
 namespace Writer {
     void init();
-    void tick();
 }
 
 #endif

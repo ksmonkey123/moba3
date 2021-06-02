@@ -20,8 +20,10 @@ void Switches::setSwitch(byte id, Switches::STATUS status) {
 
     if (sw->selected != status) {
         sw->selected = status;
-        sw->dirty = true;
-        dec->dirty = true;
+        if (status != Switches::UNKNOWN) {
+            sw->dirty = true;
+            dec->dirty = true;
+        }
     }
 }
 

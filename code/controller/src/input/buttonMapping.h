@@ -1,0 +1,28 @@
+#ifndef BUTTON_MAPPINGS_H
+#define BUTTON_MAPPINGS_H
+
+#define BUTTON_YARD_01 0x00
+#define BUTTON_YARD_02 0x01
+#define BUTTON_YARD_03 0x02
+#define BUTTON_YARD_04 0x03
+#define BUTTON_YARD_05 0x04
+#define BUTTON_YARD_06 0x05
+#define BUTTON_YARD_07 0x06
+#define BUTTON_YARD_08 0x07
+#define BUTTON_YARD_09 0x08
+#define BUTTON_YARD_10 0x09
+#define BUTTON_YARD_L  0x0a
+#define BUTTON_YARD_R  0x0b
+#define BUTTON_YARD_CL 0x0c
+
+#define BUTTON_TRACK_C 0x18
+#define BUTTON_TRACK_1 0x10
+#define BUTTON_TRACK_2 0x11
+#define BUTTON_TRACK_3 0x12
+#define BUTTON_TRACK_4 0x13
+#define BUTTON_TRACK_5 0x14
+#define BUTTON_TRACK_6 0x15
+#define BUTTON_TRACK_7 0x16
+#define BUTTON_TRACK_8 0x17
+
+#endif

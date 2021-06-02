@@ -25,7 +25,7 @@ void processCharacter(char c) {
 }
 
 void Network::tick() {
-    if (Serial.available()) {
+    for (byte i = 0; i < NETWORK_MAX_ITERATIONS && (Serial.available() > 0); i++) {
         char c = Serial.read();
         if (c != 0) {
             processCharacter(c);

@@ -1,18 +1,18 @@
 #include <Arduino.h>
 #include "input/network.h"
 #include "input/buttons.h"
-#include "control/control.h"
+#include "control/control_modules.h"
+#include "timer.h"
 #include "output/writer.h"
 
 void setup() {
     Buttons::init();
     Network::init();
-    Control::init();
+    initControllers();
     Writer::init();
 }
 
 void loop() {
     Network::tick();
-    Control::tick();
-    Writer::tick();
+    Timer::tickTimers();
 }

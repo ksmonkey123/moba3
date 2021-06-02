@@ -9,6 +9,9 @@
 // - the maximum number of characters that can be consumed between logic ticks. larger values may starve the logic classes of CPU cycles
 #define NETWORK_MAX_ITERATIONS 10
 
+#define TIMER_COUNT 3
+
 #define SWITCH_DECODER_COUNT 5
+
 
 #endif
