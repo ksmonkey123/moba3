@@ -13,7 +13,7 @@ static struct SwitchModel {
 
 void Switches::setSwitch(byte id, Switches::STATUS status) {
     byte decoder = ((id & 0x70) >> 4) - 1;
-    byte channel = (id & 0x07);
+    byte channel = (id & 0x07) - 1;
 
     SwitchModel::SwitchDecoderState* dec = model.decoder + decoder;
     SwitchModel::SwitchDecoderState::SwitchStatus* sw = dec->channel + channel;
@@ -37,7 +37,7 @@ void Switches::getNextCommand(char* buffer) {
             for(byte j = 0; j < 6; j++) {
                 auto sw = dec->channel + j;
                 if (sw->dirty) {
-                    buffer[index++] = '0' + j;
+                    buffer[index++] = '1' + j;
                     buffer[index++] = sw->selected;
                     sw->dirty = false;
                 }

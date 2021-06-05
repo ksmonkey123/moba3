@@ -23,11 +23,11 @@ void Buttons::processInput(char* buffer) {
         return;
     }
 
-    if (buffer[0] < 'A' || buffer[0] > 'E') {
+    if (buffer[0] < '0' || buffer[0] > '3') {
         return;
     }
 
-    ButtonSector* sector = &_buttons.sector[buffer[0] - 'A'];
+    ButtonSector* sector = &_buttons.sector[buffer[0] - '0'];
     auto id = Util::decodeHexString(buffer + 1, 1);
     auto direction = buffer[2];
 

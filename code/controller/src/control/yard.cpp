@@ -61,7 +61,7 @@ static void process(Timer*) {
     byte first;
     byte second;
 
-    if (Buttons::readList(trackButtons, 12, &first, &second)) {
+    if (Buttons::readList(trackButtons, 12, &first, &second) == 2) {
         if (first > 1 || second < 2) {
             return;
         }
@@ -81,11 +81,12 @@ static void process(Timer*) {
             Switches::setSwitch(SWITCH_YARD_02, track < 3 ? Switches::STRAIGHT : Switches::DIVERGING);
             if (track == 0) {
                 Switches::setSwitch(SWITCH_YARD_10, Switches::STRAIGHT);
+                Switches::setSwitch(SWITCH_YARD_09, Switches::DIVERGING);
             } else if (track > 2 && track < 7) {
                 Switches::setSwitch(SWITCH_YARD_03, Switches::STRAIGHT);
                 Switches::setSwitch(SWITCH_YARD_04, track == 3 ? Switches::DIVERGING : Switches::STRAIGHT);
                 if (track > 3) {
-                    Switches::setSwitch(SWITCH_YARD_07, track == 4 ? Switches::STRAIGHT : Switches::DIVERGING);
+                    Switches::setSwitch(SWITCH_YARD_07, track == 4 ? Switches::DIVERGING : Switches::STRAIGHT);
                     if (track > 4) {
                         Switches::setSwitch(SWITCH_YARD_08, track == 5 ? Switches::DIVERGING : Switches::STRAIGHT);
                     }

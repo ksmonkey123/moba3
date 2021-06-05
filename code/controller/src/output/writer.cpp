@@ -6,7 +6,7 @@
 
 #include "../timer.h"
 
-void tick(Timer* timer);
+static void tick(Timer* timer);
 
 void Writer::init() {
     Timer::create(100, tick)->start();
@@ -22,7 +22,7 @@ void fillBuffer() {
     }
 }
 
-void tick(Timer* timer) {
+static void tick(Timer* timer) {
     if (index == 0) {
         fillBuffer();
     }
