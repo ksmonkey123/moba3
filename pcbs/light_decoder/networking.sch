@@ -65,10 +65,6 @@ Wire Wire Line
 Wire Wire Line
 	5300 3850 5300 2750
 Connection ~ 5300 2750
-Text Label 4750 2750 0    50   ~ 0
-A+
-Text Label 4750 3050 0    50   ~ 0
-A-
 Wire Wire Line
 	5300 2500 6000 2500
 Wire Wire Line
@@ -80,9 +76,9 @@ Wire Wire Line
 Wire Wire Line
 	6000 4550 6000 4500
 Wire Wire Line
-	6000 4200 5750 4200
+	6000 4200 5850 4200
 Connection ~ 6000 4200
-Text GLabel 5750 4200 0    50   Input ~ 0
+Text GLabel 5850 4200 0    50   Input ~ 0
 GND
 Text GLabel 5750 2850 0    50   Input ~ 0
 GND
@@ -93,8 +89,6 @@ Text HLabel 5800 3150 0    50   Input ~ 0
 PoE
 Wire Wire Line
 	6000 3100 6000 3150
-Wire Wire Line
-	5800 3150 5900 3150
 Connection ~ 6000 3150
 Wire Wire Line
 	6000 3150 6000 3200
@@ -122,17 +116,6 @@ Wire Wire Line
 	2550 2350 3450 2350
 Wire Wire Line
 	2500 3450 2950 3450
-$Comp
-L Connector:RJ45_LED_Shielded J4
-U 1 1 60AE9919
-P 6400 2800
-F 0 "J4" H 6400 3375 50  0000 C CNN
-F 1 "RJ45_LED_Shielded" H 6400 3466 50  0000 C CNN
-F 2 "customs:RND_RJ45_LED" V 6400 2825 50  0001 C CNN
-F 3 "~" V 6400 2825 50  0001 C CNN
-	1    6400 2800
-	-1   0    0    1   
-$EndComp
 $Comp
 L Connector:RJ45_LED_Shielded J5
 U 1 1 60AED713
@@ -179,8 +162,6 @@ Text HLabel 7100 3100 2    50   Input ~ 0
 PoE
 Text GLabel 6800 3200 2    50   Input ~ 0
 GND
-Text GLabel 7750 2600 2    50   Input ~ 0
-GND
 $Comp
 L Device:R R18
 U 1 1 60AFD923
@@ -194,67 +175,25 @@ F 3 "~" H 6950 2500 50  0001 C CNN
 $EndComp
 Text HLabel 7100 2500 2    50   Input ~ 0
 PoE
-$Comp
-L Transistor_FET:2N7002 Q13
-U 1 1 60AFE446
-P 7550 2700
-F 0 "Q13" V 7892 2700 50  0000 C CNN
-F 1 "2N7002" V 7801 2700 50  0000 C CNN
-F 2 "Package_TO_SOT_SMD:SOT-23" H 7750 2625 50  0001 L CIN
-F 3 "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF" H 7550 2700 50  0001 L CNN
-	1    7550 2700
-	0    -1   -1   0   
-$EndComp
-$Comp
-L Device:R R22
-U 1 1 60B04F46
-P 7700 2900
-F 0 "R22" V 7500 2850 50  0000 L CNN
-F 1 "1k" V 7600 2850 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 7630 2900 50  0001 C CNN
-F 3 "~" H 7700 2900 50  0001 C CNN
-	1    7700 2900
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	7350 2600 6800 2600
-Text HLabel 7850 2900 2    50   Input ~ 0
+Text HLabel 7450 2850 2    50   Input ~ 0
 Rx
-Wire Wire Line
-	6000 2700 5900 2700
-Wire Wire Line
-	5900 2700 5900 3150
-Connection ~ 5900 3150
-Wire Wire Line
-	5900 3150 6000 3150
-Wire Wire Line
-	6000 3000 6000 2900
-Connection ~ 6000 2900
 $Comp
 L Device:R R21
 U 1 1 60B07AA6
-P 6950 4450
-F 0 "R21" V 6750 4400 50  0000 L CNN
-F 1 "1k" V 6850 4400 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 6880 4450 50  0001 C CNN
-F 3 "~" H 6950 4450 50  0001 C CNN
-	1    6950 4450
-	0    1    1    0   
+P 6800 4750
+F 0 "R21" V 6600 4700 50  0000 L CNN
+F 1 "1k" V 6700 4700 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 6730 4750 50  0001 C CNN
+F 3 "~" H 6800 4750 50  0001 C CNN
+	1    6800 4750
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	6800 4550 6800 5000
 Wire Wire Line
 	6800 5000 5550 5000
 Wire Wire Line
-	5550 5000 5550 4350
-Wire Wire Line
-	5550 4350 6000 4350
-Wire Wire Line
-	6000 4050 5500 4050
-Wire Wire Line
-	5500 4050 5500 5050
-Wire Wire Line
-	5500 5050 7100 5050
+	6000 4050 5550 4050
 Wire Wire Line
 	7100 5050 7100 4450
 $Comp
@@ -273,6 +212,43 @@ PoE
 Wire Wire Line
 	6800 3950 7350 3950
 Wire Wire Line
-	7350 3950 7350 2600
-Connection ~ 7350 2600
+	7350 3950 7350 2850
+$Comp
+L Connector:RJ45_LED_Shielded J4
+U 1 1 60AE9919
+P 6400 2800
+F 0 "J4" H 6400 3375 50  0000 C CNN
+F 1 "RJ45_LED_Shielded" H 6400 3466 50  0000 C CNN
+F 2 "customs:RND_RJ45_LED" V 6400 2825 50  0001 C CNN
+F 3 "~" V 6400 2825 50  0001 C CNN
+	1    6400 2800
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6000 3100 6000 3000
+Connection ~ 6000 3100
+Wire Wire Line
+	5800 3150 6000 3150
+Wire Wire Line
+	6000 2700 6000 2800
+Connection ~ 6000 2800
+Wire Wire Line
+	7450 2850 7350 2850
+Connection ~ 7350 2850
+Wire Wire Line
+	7350 2850 7350 2600
+Wire Wire Line
+	6800 4550 6800 4600
+Wire Wire Line
+	6800 4900 6800 5000
+Wire Wire Line
+	5500 5050 7100 5050
+Wire Wire Line
+	6800 4450 7100 4450
+Wire Wire Line
+	5550 4050 5550 5000
+Wire Wire Line
+	6000 4350 5500 4350
+Wire Wire Line
+	5500 4350 5500 5050
 $EndSCHEMATC

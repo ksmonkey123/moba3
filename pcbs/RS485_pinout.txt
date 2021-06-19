@@ -1,0 +1,32 @@
+RS-485 - RJ45 Pinout
+====================
+
+Pin 1 - g - MOSI_B
+Pin 2 - G - MOSI_A
+Pin 3 - o - MISO_B / STATUS_B(-)
+Pin 4 - B - PoE_GND
+Pin 5 - b - PoE_GND
+Pin 6 - O - MISO_A / STATUS_A(+)
+Pin 7 - br- PoE_5V
+Pin 8 - Br- PoE_5V
+
+## Notes
+
+### Controller
+ - Controller drives MOSI (Pair I) on all port
+ - Controller reads MISO (Pair II) from the interface port
+ - Controller uses STATUS (Pair II) of the decoder port to power CN-LED on said port
+ - Controller drives TX-LED of all ports from MOSI signal
+ - Controller drives CN-LED from MISO signal
+
+### Decoders
+ - Decoders only read MOSI (Pair I)
+ - Decoders feed power back through the input connector in STATUS (Pair II)
+ - Decoders use STATUS (Pair II) to power CN-LED on output port
+ - Decoders drive TX-LED of all ports from MOSI signal
+
+### Interface
+ - Interface reads MOSI (Pair I)
+ - Interface drives MISO (Pair II)
+ - Interface drives TX-LED from MISO signal
+ - Interface drives CN-LED from MOSI signal
