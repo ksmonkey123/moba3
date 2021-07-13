@@ -3,4 +3,14 @@
 *.gbr
 *-bak
 *.drl
+*.gts
+*.gtp
+*.gbl
+*.gbp
+*.gtl
+*.gbs
+*.gbo
+*.gm1
+*.gto
+*.zip
 fp-info-cache
