@@ -5,7 +5,7 @@
 
 namespace Output {
     struct Config {
-        uint16_t mask;
+        uint16_t idle;
         boolean inverted;
     };
     

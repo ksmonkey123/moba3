@@ -5,7 +5,7 @@
 // # UART settings #
 // #################
 // - transmission speed
-#define NETWORK_BAUDRATE 2000000
+#define NETWORK_BAUDRATE 9600
 // - the network buffer size defines the max. supported command length (not including addressing and termination character)
 #define NETWORK_BUFFER_SIZE 12
 // - the maximum number of characters that can be consumed between logic ticks. larger values may starve the logic classes of CPU cycles
@@ -18,17 +18,7 @@
 #define OUTPUT_LATCH_PIN 10
 #define OUTPUT_ENABLE_PIN 9
 
-// ############################
-// # CONFIGURATION DIP-SWITCH #
-// ############################
-
-// - a 6-channel DIP-switch is used. 3 channels define the decoder type, while the other 3 define the address
-#define CONFIG_PIN_ADDR_1 A0
-#define CONFIG_PIN_ADDR_2 A1
-#define CONFIG_PIN_ADDR_4 A2
-#define CONFIG_PIN_TYPE_1 A3
-#define CONFIG_PIN_TYPE_2 A4
-#define CONFIG_PIN_C_FLAG A5
+#define LED_PIN 2
 
 // ####################
 // # CONTROL SETTINGS #

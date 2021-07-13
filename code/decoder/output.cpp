@@ -8,18 +8,20 @@ static uint16_t state;
 static Output::Config config;
 
 void send(uint16_t data) {
+    digitalWrite(LED_PIN, data != config.idle);
     digitalWrite(OUTPUT_LATCH_PIN, LOW);
     if (config.inverted) {
         data ^= 0xffff;
     }
-    SPI.transfer16(data & config.mask);
+    SPI.transfer16(data);
     digitalWrite(OUTPUT_LATCH_PIN, HIGH);
 }
 
 void Output::init(uint16_t data, Config* __config) {
+    pinMode(LED_PIN, OUTPUT);
+    digitalWrite(LED_PIN, true);
     if (__config == nullptr) {
         memset(&config, 0, sizeof(Config));
-        config.mask = 0xffff;
     } else {
         memcpy(&config, __config, sizeof(Config));
     }

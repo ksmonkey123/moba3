@@ -4,8 +4,7 @@
 #include "utils.h"
 
 void Light::init() {
-  Output::Config conf = { .mask = (_chipConfig.type == Config::Type::EXIT) ? 0x001f : 0xffff };
-  Output::init(0, &conf);
+  Output::init(0, nullptr);
 }
 
 void Light::process(char* buffer, char length) {

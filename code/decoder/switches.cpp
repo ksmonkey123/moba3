@@ -5,8 +5,7 @@
 #include "settings.h"
 
 void Switches::init() {
-  Output::Config conf = { .mask = 0x3f3f };
-  Output::init(0, &conf);
+  Output::init(0, nullptr);
 
   memset(&_logicData.switches, 0, sizeof(Data));
   _logicData.switches.driveTime = _chipConfig.customFlag ? SWITCH_DRIVE_TIME_HIGH : SWITCH_DRIVE_TIME_LOW;

@@ -15,7 +15,6 @@ namespace Config {
         char address;
         boolean customFlag;
     };
-    void load();
 }
 
 extern Config::Configuration _chipConfig;

@@ -5,7 +5,7 @@
 #include "settings.h"
 
 void Signal::init() {
-  Output::Config conf = { .mask = 0xffff, .inverted = true };
+  Output::Config conf = {.idle = 0x4040, .inverted = true };
   Output::init(0x4040, &conf);
 
   memset(&_logicData.switches, 0, sizeof(Data));
