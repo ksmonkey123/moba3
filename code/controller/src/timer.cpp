@@ -46,9 +46,9 @@ void Timer::tickTimers() {
 }
 
 void Timer::tick() {
-    auto now = micros();
-    if (now - this->lastTime > this->interval) {
-        this->lastTime = now;
+    auto currentMicros = micros();
+    if (currentMicros - this->lastTime > this->interval) {
+        this->lastTime = currentMicros;
         this->handler(this);
     }
 }

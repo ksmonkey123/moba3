@@ -1,5 +1,6 @@
 #include "switches.h"
 #include "../settings.h"
+#include "../statusLed.h"
 
 static struct SwitchModel {
     struct SwitchDecoderState {
@@ -23,6 +24,7 @@ void Switches::setSwitch(byte id, Switches::STATUS status) {
         if (status != Switches::UNKNOWN) {
             sw->dirty = true;
             dec->dirty = true;
+            StatusLED::blink();
         }
     }
 }

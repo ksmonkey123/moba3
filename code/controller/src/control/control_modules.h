@@ -13,6 +13,9 @@
 /** initialises all processing modules */
 void initControllers();
 
+/** blink LED */
+void blinkLED();
+
 /** manages the track switches */
 namespace Tracks { void init(); };
 namespace Yard   { void init(); };

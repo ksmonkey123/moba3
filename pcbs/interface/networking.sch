@@ -122,16 +122,28 @@ Wire Wire Line
 	4400 2350 4400 2500
 Connection ~ 4400 2500
 Wire Wire Line
-	4400 2500 6000 2500
-Wire Wire Line
 	4700 2350 4700 2600
 Connection ~ 4700 2600
 Wire Wire Line
-	4700 2600 6000 2600
+	4700 2600 5400 2600
 Text GLabel 5800 3150 0    50   Input ~ 0
 5V
 Text GLabel 7100 3100 2    50   Input ~ 0
 5V
 Text GLabel 7100 2500 2    50   Input ~ 0
 5V
+Wire Wire Line
+	5400 2600 5400 2500
+Wire Wire Line
+	4400 2500 5350 2500
+Wire Wire Line
+	5400 2500 6000 2500
+Wire Wire Line
+	5450 2600 5450 2550
+Wire Wire Line
+	5450 2550 5350 2550
+Wire Wire Line
+	5350 2550 5350 2500
+Wire Wire Line
+	5450 2600 6000 2600
 $EndSCHEMATC
