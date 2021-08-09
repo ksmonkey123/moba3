@@ -5,11 +5,12 @@
 #include "display.h"
 
 #include "../timer.h"
+#include "../settings.h"
 
 static void tick(Timer* timer);
 
 void Writer::init() {
-    Timer::create(100, tick)->start();
+    Timer::create(NETWORK_TIMER_PERIOD, tick)->start();
 }
 
 static char buffer[20];
@@ -17,7 +18,7 @@ static byte index;
 
 void fillBuffer() {
     Switches::getNextCommand(buffer);
-    if (buffer[0] == 0) {
+    if (buffer[0] == '\0') {
         Display::getNextCommand(buffer);
     }
 }
@@ -28,9 +29,9 @@ static void tick(Timer* timer) {
     }
     while(Serial.availableForWrite() > 0) {
         char c = buffer[index++];
-        if (c == 0) {
+        if (c == '\0') {
             index = 0;
-            buffer[0] = 0;
+            buffer[0] = '\0';
             return;
         }
         Serial.print(c);

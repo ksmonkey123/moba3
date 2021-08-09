@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "buttons.h"
 #include "../utils.h"
+#include "../output/switches.h"
 
 /** a single 16-bit button sector */
 struct ButtonSector {
@@ -10,7 +11,9 @@ struct ButtonSector {
 /** the internal model */
 struct ButtonModel {
     ButtonSector sector[4];
-} _buttons;
+};
+
+static ButtonModel _buttons;
 
 void Buttons::init() {
     memset(&_buttons, 0, sizeof(ButtonModel));
@@ -20,6 +23,7 @@ void Buttons::processInput(char* buffer) {
     if (buffer[0] == 'X' && buffer[1] == 'X' && buffer[2] == 'X') {
         Serial.println("RESET");
         Buttons::init();
+        Switches::reset();
         return;
     }
 

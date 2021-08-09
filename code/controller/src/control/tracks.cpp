@@ -3,7 +3,7 @@
 static void process(Timer*);
 
 void Tracks::init() {
-    Timer::create(10000, process)->start();
+    Timer::create(process)->start();
 }
 
 static void process(Timer*) {

@@ -12,12 +12,24 @@ static struct SwitchModel {
     } decoder[SWITCH_DECODER_COUNT];
 } model;
 
+void Switches::reset() {
+    for (byte i = 0; i < SWITCH_DECODER_COUNT; i++) {
+        auto decoder = model.decoder + i;
+        for (byte j = 0; j < 6; j++) {
+            auto channel = decoder->channel + j;
+            channel->selected = UNKNOWN;
+            channel->dirty = false;
+        }
+        decoder->dirty = false;
+    }
+}
+
 void Switches::setSwitch(byte id, Switches::STATUS status) {
     byte decoder = ((id & 0x70) >> 4) - 1;
     byte channel = (id & 0x07) - 1;
 
-    SwitchModel::SwitchDecoderState* dec = model.decoder + decoder;
-    SwitchModel::SwitchDecoderState::SwitchStatus* sw = dec->channel + channel;
+    auto dec = model.decoder + decoder;
+    auto sw = dec->channel + channel;
 
     if (sw->selected != status) {
         sw->selected = status;

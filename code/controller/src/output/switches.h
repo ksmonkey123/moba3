@@ -15,6 +15,8 @@ namespace Switches {
 
     void getNextCommand(char* buffer);
 
+    void reset();
+
 }
  
 #endif

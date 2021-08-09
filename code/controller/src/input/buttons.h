@@ -14,9 +14,9 @@ namespace Buttons {
      * processes a single button event as provided by the I/O board
      * 
      * @param buffer the input buffer holding a (non-terminated) 3 characters long string.
-     * Format: `[A-D][0-9a-f][+-]`
-     *  - channel selection [A-D = 0-3]
-     *  - button address
+     * Format: `[0-3][0-9a-f][+-]`
+     *  - channel selection [0-3]
+     *  - hex button address
      *  - direction [+ = down, - = up]
      */
     void processInput(char* buffer);
@@ -30,11 +30,11 @@ namespace Buttons {
     boolean read(byte id);
 
     /**
-     * reads the state of all buttons in the list
+     * reads the state of all buttons in the list. (max 255 entries)
      * 
      * @param buttons the button ids to check. each id will be replaced by 0 or 1 to represent the button state.
      * @param len the length of the buttons array
-     * @param firstIndex pinter where the index of the first pressed button is written. passing a nullptr disables this.
+     * @param firstIndex pointer where the index of the first pressed button is written. passing a nullptr disables this.
      * @param lastIndex pointer where the index of the last pressed button is written. passing a nullptr disables this.
      * @return the number of pressed buttons
      */

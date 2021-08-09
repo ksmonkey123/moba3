@@ -6,6 +6,7 @@
 class Timer {
     public:
         Timer();
+        static Timer* create(void(*handler)(Timer*));
         static Timer* create(unsigned long, void(*handler)(Timer*));
         static void tickTimers();
 

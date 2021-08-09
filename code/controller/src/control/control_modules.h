@@ -17,7 +17,8 @@ void initControllers();
 void blinkLED();
 
 /** manages the track switches */
-namespace Tracks { void init(); };
-namespace Yard   { void init(); };
+namespace Tracks   { void init(); };
+namespace Yard     { void init(); };
+namespace Darkmode { void init(); };
 
 #endif

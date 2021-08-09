@@ -18,6 +18,8 @@ namespace Display {
     void set(byte sector, byte data, byte mask);
 
     void getNextCommand(char* buffer);
+
+    void toggleDarkmode();
 }
 
 #endif

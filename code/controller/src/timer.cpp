@@ -4,11 +4,42 @@
 static byte timerCount;
 static Timer timers[TIMER_COUNT];
 
+static void freezeTooManyTimers() {
+    while (true) {
+        digitalWrite(LED_PIN, true);
+        #ifdef DEBUG_LOG
+        Serial.print("ERROR: too many timers - timer ");
+        Serial.print(timerCount);
+        Serial.print('/');
+        Serial.print(TIMER_COUNT);
+        Serial.println(" was requested");
+        #endif
+        delay(1000);
+    }
+}
+
+static void logTimerCreation() {
+    Serial.print("INFO: creating timer ");
+    Serial.print(timerCount);
+    Serial.print('/');
+    Serial.println(TIMER_COUNT);
+}
+
 Timer* Timer::create(unsigned long interval, void (*handler)(Timer*)) {
     auto index = timerCount++;
+    if (index >= TIMER_COUNT) {
+        freezeTooManyTimers();
+    }
+    #ifdef DEBUG_LOG
+    logTimerCreation();
+    #endif
     timers[index] = Timer();
     timers[index].configure(interval, handler);
     return timers + index;
+}
+
+Timer* Timer::create(void (*handler)(Timer*)) {
+    return create(DEFAULT_TIMER_PERIOD, handler);
 }
 
 Timer::Timer() {

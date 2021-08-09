@@ -9,7 +9,7 @@ static void disable(Timer*) {
 static Timer* timer;
 
 static void _init() {
-    timer = Timer::create(50000L, disable);
+    timer = Timer::create(LED_PULSE_DURATION, disable);
     pinMode(LED_PIN, OUTPUT);
 }
 

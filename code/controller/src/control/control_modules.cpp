@@ -3,4 +3,5 @@
 void initControllers() {
     Tracks::init();
     Yard::init();
+    Darkmode::init();
 }

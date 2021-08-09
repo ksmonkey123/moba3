@@ -8,8 +8,8 @@
 
 void setup() {
     delay(500);
-    Buttons::init();
     Network::init();
+    Buttons::init();
     initControllers();
     Writer::init();
     StatusLED::blink();
