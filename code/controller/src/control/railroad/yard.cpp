@@ -1,4 +1,4 @@
-#include "control_modules.h"
+#include "../control_modules.h"
 
 static void process(Timer*);
 
@@ -8,6 +8,9 @@ static byte currentTrack = -1;
 static Entry currentEntry = NONE;
 
 void Yard::init() {
+    #ifdef DEBUG_LOG
+    Serial.println("init yard controller");
+    #endif
     Timer::create(process)->start();
 }
 

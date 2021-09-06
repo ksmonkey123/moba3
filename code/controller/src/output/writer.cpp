@@ -2,6 +2,8 @@
 #include "writer.h"
 
 #include "switches.h"
+#include "entrySignals.h"
+#include "exitSignals.h"
 #include "display.h"
 
 #include "../timer.h"
@@ -10,16 +12,29 @@
 static void tick(Timer* timer);
 
 void Writer::init() {
+    #ifdef DEBUG_LOG
+    Serial.println("init writer");
+    #endif
     Timer::create(NETWORK_TIMER_PERIOD, tick)->start();
 }
 
 static char buffer[20];
 static byte index;
 
+static void(*commandProviders[])(char*) = {
+    Switches::getNextCommand,
+    EntrySignals::getNextCommand,
+    ExitSignals::getNextCommand,
+    Display::getNextCommand,
+};
+
 void fillBuffer() {
-    Switches::getNextCommand(buffer);
-    if (buffer[0] == '\0') {
-        Display::getNextCommand(buffer);
+    byte size = sizeof(commandProviders) / sizeof(commandProviders[0]);
+    for (byte i = 0; i < size; i++) {
+        commandProviders[i](buffer);
+        if (buffer[0] != '\0') {
+            return;
+        }
     }
 }
 

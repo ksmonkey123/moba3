@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "buttons.h"
+#include "../settings.h"
 #include "../utils.h"
 #include "../output/switches.h"
 
@@ -25,6 +26,13 @@ void Buttons::processInput(char* buffer) {
         Buttons::init();
         Switches::reset();
         return;
+    }
+
+    if (buffer[0] == '-' && buffer[1] == '-' && buffer[2] == '-') {
+        #ifdef DEBUG_LOG
+        Serial.println("BUTTONS CLEARED");
+        #endif
+        Buttons::init();
     }
 
     if (buffer[0] < '0' || buffer[0] > '3') {

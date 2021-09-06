@@ -6,9 +6,14 @@
 #include "../input/buttons.h"
 #include "../input/buttonMapping.h"
 #include "../output/switches.h"
+#include "../output/entrySignals.h"
 #include "../output/display.h"
 #include "../output/switchMapping.h"
+#include "../output/entrySignalMapping.h"
+#include "../output/exitSignals.h"
+#include "../output/exitSignalMapping.h"
 #include "../timer.h"
+#include "../settings.h"
 
 /** initialises all processing modules */
 void initControllers();
@@ -17,8 +22,16 @@ void initControllers();
 void blinkLED();
 
 /** manages the track switches */
-namespace Tracks   { void init(); };
-namespace Yard     { void init(); };
+namespace Yard      { void init(); };
+namespace Tracks    { void init(); };
+namespace Station {
+    namespace Left  { void init(); };
+    namespace Right { void init(); };
+}
+
+/** lighting controllers */
+
+/** high-level controller for the dark-mode toggle button */
 namespace Darkmode { void init(); };
 
 #endif
