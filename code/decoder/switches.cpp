@@ -30,6 +30,10 @@ void Switches::process(char* buffer, char length) {
         break;
       case 'b':
         channel->pendingState = 2;
+        break;
+      case '!':
+        channel->state = 0;
+        break;
     }
   }
 }
