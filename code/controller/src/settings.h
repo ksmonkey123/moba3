@@ -11,7 +11,7 @@
 
 #ifdef ARDUINO_AVR_UNO
 #define LED_PIN LED_BUILTIN
-//#define DEBUG_LOG
+#define DEBUG_LOG
 #else
 #define LED_PIN 2
 #endif
