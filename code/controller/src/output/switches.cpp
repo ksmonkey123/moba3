@@ -41,7 +41,7 @@ void Switches::setSwitch(byte id, Switches::STATUS status) {
     }
 }
 
-void Switches::getNextCommand(char* buffer) {
+static void nextFullCommand(char* buffer) {
     for(byte i = 0; i < SWITCH_DECODER_COUNT; i++) {
         auto dec = model.decoder + i;
         if (dec->dirty) {
@@ -64,4 +64,59 @@ void Switches::getNextCommand(char* buffer) {
     }
     // none dirty
     buffer[0] = 0;
+}
+
+void Switches::getNextCommand(char* buffer) {
+    buffer[0] = '\0';
+
+    static unsigned long lastCall = 0;
+    if (lastCall + SWITCH_STAGGERING_PERIOD > millis()) {
+        // last call was too recent
+        return;
+    }
+
+    for (byte i = 0; i < SWITCH_DECODER_COUNT; i++) {
+        auto dec = model.decoder + i;
+        if (!dec->dirty) {
+            continue;
+        }
+
+        // decoder is dirty
+        SwitchModel::SwitchDecoderState::SwitchStatus* sw = nullptr;
+        byte j = 0;
+        for (; j < 6; j++) {
+            auto s = dec->channel + j;
+            if (s->dirty) {
+                sw = s;
+                break;
+            }
+        }
+        if (sw == nullptr) {
+            // decoder was wrongfully marked as dirty
+            dec->dirty = false;
+            continue;
+        }
+
+        // we have a dirty switch
+        buffer[0] = 'W';
+        buffer[1] = '1' + i;
+        buffer[2] = '1' + j;
+        buffer[3] = sw->selected;
+        buffer[4] = '\n';
+        buffer[5] = '\0';
+
+        // clean up dirty state
+        lastCall = millis();
+        sw->dirty = false;
+
+        for (; j < 6; j++) {
+            if((dec->channel + j)->dirty) {
+                // there are dirty switches left
+                return;
+            }
+        }
+        
+        dec->dirty = false;
+        return;
+    }
 }
