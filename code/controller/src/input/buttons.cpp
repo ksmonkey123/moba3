@@ -29,9 +29,6 @@ void Buttons::processInput(char* buffer) {
     }
 
     if (buffer[0] == '-' && buffer[1] == '-' && buffer[2] == '-') {
-        #ifdef DEBUG_LOG
-        Serial.println("BUTTONS CLEARED");
-        #endif
         Buttons::init();
     }
 
