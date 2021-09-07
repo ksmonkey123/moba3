@@ -7,7 +7,7 @@
 
 void setup() {
   _chipConfig.type = Config::Type::SWITCH;
-  _chipConfig.address = '3';
+  _chipConfig.address = '5';
 
   Logic::init();
   Network::init(_logicConfig.process);

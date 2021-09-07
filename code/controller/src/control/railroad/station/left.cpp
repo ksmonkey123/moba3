@@ -19,9 +19,6 @@ static Path paths[] = {
     { .target = -1, .direction = SignalDirection::DISABLED }};
 
 void Station::Left::init() {
-    #ifdef DEBUG_LOG
-    Serial.println("init station left controller");
-    #endif
     Timer::create(tick)->start();
     upgradeTimer = Timer::create(SIGNAL_UPGRADE_DELAY, upgrade);
 }

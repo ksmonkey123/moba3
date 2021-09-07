@@ -12,9 +12,6 @@
 static void tick(Timer* timer);
 
 void Writer::init() {
-    #ifdef DEBUG_LOG
-    Serial.println("init writer");
-    #endif
     Timer::create(NETWORK_TIMER_PERIOD, tick)->start();
 }
 

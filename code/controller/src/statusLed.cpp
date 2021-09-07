@@ -9,9 +9,6 @@ static void disable(Timer*) {
 static Timer* timer;
 
 static void _init() {
-    #ifdef DEBUG_LOG
-    Serial.println("init status LED");
-    #endif
     timer = Timer::create(LED_PULSE_DURATION, disable);
     pinMode(LED_PIN, OUTPUT);
 }

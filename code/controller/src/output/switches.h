@@ -13,10 +13,12 @@ namespace Switches {
 
     void setSwitch(byte address, STATUS state);
 
+    void sendForcedUpdates();
+
     void getNextCommand(char* buffer);
 
     void reset();
 
 }
- 
+
 #endif

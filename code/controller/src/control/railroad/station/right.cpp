@@ -23,9 +23,6 @@ static struct {
 } data;
 
 void Station::Right::init() {
-    #ifdef DEBUG_LOG
-    Serial.println("init station right controller");
-    #endif
     Timer::create(tick)->start();
     upgradeTimer = Timer::create(SIGNAL_UPGRADE_DELAY, upgrade);
 }

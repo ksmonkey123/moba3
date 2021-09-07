@@ -3,9 +3,6 @@
 static void process(Timer*);
 
 void Tracks::init() {
-    #ifdef DEBUG_LOG
-    Serial.println("init track controller");
-    #endif
     Timer::create(process)->start();
 }
 

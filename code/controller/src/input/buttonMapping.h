@@ -57,5 +57,6 @@
 #define BUTTON_KEYBOARD_15 0x3e
 
 #define BUTTON_DARKMODE 0x3f
+#define BUTTON_SWITCHES_DISABLED 0x0d
 
 #endif

@@ -22,16 +22,17 @@ void initControllers();
 void blinkLED();
 
 /** manages the track switches */
-namespace Yard      { void init(); };
-namespace Tracks    { void init(); };
+namespace Yard      { void init(); }
+namespace Tracks    { void init(); }
 namespace Station {
-    namespace Left  { void init(); };
-    namespace Right { void init(); };
+    namespace Left  { void init(); }
+    namespace Right { void init(); }
 }
 
 /** lighting controllers */
 
-/** high-level controller for the dark-mode toggle button */
-namespace Darkmode { void init(); };
+/** system-wide controllers */
+namespace Darkmode  { void init(); }
+namespace ForcedUpd { void init(); }
 
 #endif

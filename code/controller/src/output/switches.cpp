@@ -10,7 +10,19 @@ static struct SwitchModel {
         } channel[6];
         boolean dirty;
     } decoder[SWITCH_DECODER_COUNT];
+    boolean dirty;
+    struct ForcedUpdate {
+        bool enabled;
+        byte decoder;
+        byte channel;
+    } forcedUpdate;
 } model;
+
+void Switches::sendForcedUpdates() {
+    model.forcedUpdate.enabled = true;
+    model.forcedUpdate.channel = 0;
+    model.forcedUpdate.decoder = 0;
+}
 
 void Switches::reset() {
     for (byte i = 0; i < SWITCH_DECODER_COUNT; i++) {
@@ -22,6 +34,7 @@ void Switches::reset() {
         }
         decoder->dirty = false;
     }
+    model.dirty = false;
 }
 
 void Switches::setSwitch(byte id, Switches::STATUS status) {
@@ -36,6 +49,7 @@ void Switches::setSwitch(byte id, Switches::STATUS status) {
         if (status != Switches::UNKNOWN) {
             sw->dirty = true;
             dec->dirty = true;
+            model.dirty = true;
             StatusLED::blink();
         }
     }
@@ -66,9 +80,7 @@ static void nextFullCommand(char* buffer) {
     buffer[0] = 0;
 }
 
-void Switches::getNextCommand(char* buffer) {
-    buffer[0] = '\0';
-
+static void getNormalCommand(char* buffer) {
     static unsigned long lastCall = 0;
     if (lastCall + SWITCH_STAGGERING_PERIOD > millis()) {
         // last call was too recent
@@ -119,4 +131,43 @@ void Switches::getNextCommand(char* buffer) {
         dec->dirty = false;
         return;
     }
+    model.dirty = false;
+}
+
+static void getForcedUpdateCommand(char* buffer) {
+    static unsigned long lastCall = 0;
+    if (lastCall + SWITCH_STAGGERING_PERIOD > millis()) {
+        // last call was too recent
+        return;
+    }
+    lastCall = millis();
+
+    byte* decoder = &model.forcedUpdate.decoder;
+    byte* channel = &model.forcedUpdate.channel;
+
+    buffer[0] = 'W';
+    buffer[1] = '1' + *decoder;
+    buffer[2] = '1' + *channel;
+    buffer[3] = '!';
+    buffer[4] = '\n';
+    buffer[5] = '\0';
+
+    if (++*channel == 6) {
+        *channel = 0;
+        if (++*decoder == SWITCH_DECODER_COUNT) {
+            *decoder = 0;
+            model.forcedUpdate.enabled = false;
+        }
+    }
+}
+
+void Switches::getNextCommand(char* buffer) {
+    buffer[0] = '\0';
+
+    if (model.forcedUpdate.enabled) {
+        getForcedUpdateCommand(buffer);
+    } else if (model.dirty) {
+        getNormalCommand(buffer);
+    }
+
 }

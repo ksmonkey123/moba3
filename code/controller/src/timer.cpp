@@ -4,25 +4,21 @@
 static byte timerCount;
 static Timer timers[TIMER_COUNT];
 
+static void logTimerCreation() {
+    Serial.print("T ");
+    Serial.print(timerCount);
+    Serial.print('/');
+    Serial.println(TIMER_COUNT);
+}
+
 static void freezeTooManyTimers() {
     while (true) {
         digitalWrite(LED_PIN, true);
         #ifdef DEBUG_LOG
-        Serial.print("ERROR: too many timers - timer ");
-        Serial.print(timerCount);
-        Serial.print('/');
-        Serial.print(TIMER_COUNT);
-        Serial.println(" was requested");
+        logTimerCreation();
         #endif
         delay(1000);
     }
-}
-
-static void logTimerCreation() {
-    Serial.print("INFO: creating timer ");
-    Serial.print(timerCount);
-    Serial.print('/');
-    Serial.println(TIMER_COUNT);
 }
 
 Timer* Timer::create(unsigned long interval, void (*handler)(Timer*)) {
