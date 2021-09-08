@@ -3,6 +3,7 @@
 
 #include "../utils.h"
 #include "../settings.h"
+#include "../macros.h"
 #include "../timer.h"
 
 static struct Data {
@@ -33,6 +34,8 @@ void Display::set(byte sector, byte data, byte mask) {
     }
 }
 
+static char lastCommand[15] = "D000000000000\n";
+
 void Display::getNextCommand(char* buffer) {
     if (_data.dirty) {
         buffer[0] = 'D';
@@ -42,6 +45,8 @@ void Display::getNextCommand(char* buffer) {
             index += 2;
         }
         buffer[index] = '\n';
+        buffer[index + 1] = '\0';
+        memcpy(lastCommand, buffer, 15);
         _data.dirty = false;
         _data.darkmode.blanked = false;
     } else {
@@ -52,9 +57,17 @@ void Display::getNextCommand(char* buffer) {
             buffer[0] = 'D';
             buffer[3] = '8';
             buffer[13] = '\n';
+            buffer[14] = '\0';
+            memcpy(lastCommand, buffer, 14);
             _data.darkmode.blanked = true;
         } else {
             buffer[0] = '\0';
         }
     }
+}
+
+void Display::getRepetitionCommand(char* buffer) {
+    RETRANSMIT_GUARD()
+
+    memcpy(buffer, lastCommand, 15);
 }

@@ -18,6 +18,7 @@ namespace Switches {
     void sendForcedUpdates();
 
     void getNextCommand(char* buffer);
+    void getRepetitionCommand(char* buffer);
 
     void reset();
 

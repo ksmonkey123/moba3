@@ -15,6 +15,7 @@ namespace EntrySignals {
     void setSignal(byte address, STATUS primary, STATUS secondary);
 
     void getNextCommand(char* buffer);
+    void getRepetitionCommand(char* buffer);
 
     void reset();
 

@@ -8,6 +8,7 @@ namespace ExitSignals {
     void setSignal(byte address, byte data, byte mask);
 
     void getNextCommand(char* buffer);
+    void getRepetitionCommand(char* buffer);
 
     void reset();
 

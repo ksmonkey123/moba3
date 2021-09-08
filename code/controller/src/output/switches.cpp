@@ -1,5 +1,6 @@
 #include "switches.h"
 #include "../settings.h"
+#include "../macros.h"
 #include "../statusLed.h"
 
 static struct SwitchModel {
@@ -53,31 +54,6 @@ void Switches::setSwitch(byte id, Switches::STATUS status) {
             StatusLED::blink();
         }
     }
-}
-
-static void nextFullCommand(char* buffer) {
-    for(byte i = 0; i < SWITCH_DECODER_COUNT; i++) {
-        auto dec = model.decoder + i;
-        if (dec->dirty) {
-            buffer[0] = 'W';
-            buffer[1] = '1' + i;
-            byte index = 2;
-            for(byte j = 0; j < 6; j++) {
-                auto sw = dec->channel + j;
-                if (sw->dirty) {
-                    buffer[index++] = '1' + j;
-                    buffer[index++] = sw->selected;
-                    sw->dirty = false;
-                }
-            }
-            buffer[index++] = '\n';
-            buffer[index] = 0;
-            dec->dirty = false;
-            return;
-        }
-    }
-    // none dirty
-    buffer[0] = 0;
 }
 
 static void getNormalCommand(char* buffer) {
@@ -175,4 +151,36 @@ void Switches::getNextCommand(char* buffer) {
         getNormalCommand(buffer);
     }
 
+}
+
+void Switches::getRepetitionCommand(char* buffer) {
+    if (model.dirty) {
+        // retransmission is unsafe while model is dirty - could prematurely transmit a staggered command...
+        return;
+    }
+    static byte decoderId = 0;
+    RETRANSMIT_GUARD()
+
+    auto dec = model.decoder + decoderId;
+
+    buffer[0] = 'W';
+    buffer[1] = '1' + decoderId;
+    
+    byte index = 2;
+    for (byte i = 0; i < 6; i++) {
+        auto state = (dec->channel + i)->selected;
+        if (state == UNKNOWN) {
+            continue;
+        }
+        buffer[index++] = '1' + i;
+        buffer[index++] = state;
+    }
+    if (index == 2) {
+        buffer[0] = '\0';
+    } else {
+        buffer[index++] = '\n';
+        buffer[index++] = '\0';
+    }
+    
+    NEXTVAL(decoderId, SWITCH_DECODER_COUNT)
 }

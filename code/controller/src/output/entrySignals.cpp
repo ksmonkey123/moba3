@@ -1,5 +1,6 @@
 #include "entrySignals.h"
 #include "../settings.h"
+#include "../macros.h"
 #include "../statusLed.h"
 
 static struct EntrySignalModel {
@@ -66,4 +67,25 @@ void EntrySignals::getNextCommand(char* buffer) {
     }
     // none dirty
     buffer[0] = 0;
+}
+
+void EntrySignals::getRepetitionCommand(char* buffer) {
+    static byte decoderId = 0;
+
+    RETRANSMIT_GUARD()
+
+    auto dec = model.decoder + decoderId;
+    buffer[0] = 'E';
+    buffer[1] = '1' + decoderId;
+    byte index = 2;
+    for(byte j = 0; j < 2; j++) {
+        auto sig = dec->channel + j;
+        buffer[index++] = 'a' + j;
+        buffer[index++] = '0' + sig->primary;
+        buffer[index++] = '0' + sig->secondary;
+    }
+    buffer[index++] = '\n';
+    buffer[index++] = '\0';
+    
+    NEXTVAL(decoderId, ENTRY_SIGNAL_DECODER_COUNT)
 }

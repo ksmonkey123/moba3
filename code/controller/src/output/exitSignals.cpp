@@ -2,6 +2,7 @@
 #include "../settings.h"
 #include "../statusLed.h"
 #include "../utils.h"
+#include "../macros.h"
 
 static struct ExitSignalModel {
     struct ExitSignalDecoderState {
@@ -31,16 +32,20 @@ void ExitSignals::setSignal(byte id, byte data, byte mask) {
     }
 }
 
+static void generateCommand(byte decoderId, char* buffer) {
+    buffer[0] = 'A';
+    buffer[1] = '1' + decoderId;
+    buffer[2] = 's';
+    Util::byteToHex(model.decoder[decoderId].data, buffer + 3);
+    buffer[5] = '\n';
+    buffer[6] = '\0';
+}
+
 void ExitSignals::getNextCommand(char* buffer) {
     for(byte i = 0; i < EXIT_SIGNAL_DECODER_COUNT; i++) {
         auto dec = model.decoder + i;
         if (dec->dirty) {
-            buffer[0] = 'A';
-            buffer[1] = '1' + i;
-            buffer[2] = 's';
-            Util::byteToHex(dec->data, buffer + 3);
-            buffer[5] = '\n';
-            buffer[6] = '\0';
+            generateCommand(i, buffer);
 
             dec->dirty = false;
             return;
@@ -48,4 +53,14 @@ void ExitSignals::getNextCommand(char* buffer) {
     }
     // none dirty
     buffer[0] = 0;
+}
+
+void ExitSignals::getRepetitionCommand(char* buffer) {
+    static byte decoderId = 0;
+
+    RETRANSMIT_GUARD()
+
+    generateCommand(decoderId, buffer);
+    
+    NEXTVAL(decoderId, EXIT_SIGNAL_DECODER_COUNT)
 }

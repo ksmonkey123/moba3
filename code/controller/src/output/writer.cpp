@@ -8,6 +8,7 @@
 
 #include "../timer.h"
 #include "../settings.h"
+#include "../macros.h"
 
 static void tick(Timer* timer);
 
@@ -18,16 +19,25 @@ void Writer::init() {
 static char buffer[20];
 static byte index;
 
-static void(*commandProviders[])(char*) = {
+typedef void(*CommandProvider)(char*);
+
+static CommandProvider commandProviders[] = {
+    // normal commands
     Switches::getNextCommand,
     EntrySignals::getNextCommand,
     ExitSignals::getNextCommand,
     Display::getNextCommand,
+    // continous retransmission
+    #if RETRANSMIT
+    Switches::getRepetitionCommand,
+    EntrySignals::getRepetitionCommand,
+    ExitSignals::getRepetitionCommand,
+    Display::getRepetitionCommand,
+    #endif
 };
 
 void fillBuffer() {
-    byte size = sizeof(commandProviders) / sizeof(commandProviders[0]);
-    for (byte i = 0; i < size; i++) {
+    for (byte i = 0; i < ARRAY_LENGTH(commandProviders); i++) {
         commandProviders[i](buffer);
         if (buffer[0] != '\0') {
             return;
