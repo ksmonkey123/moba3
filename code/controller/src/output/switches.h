@@ -5,6 +5,8 @@
 
 namespace Switches {
 
+    enum ForcedUpdateState { IDLE, ARMED, RUNNING };
+
     enum STATUS {
         UNKNOWN = 0,
         STRAIGHT = 'a',

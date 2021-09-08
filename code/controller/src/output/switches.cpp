@@ -12,14 +12,14 @@ static struct SwitchModel {
     } decoder[SWITCH_DECODER_COUNT];
     boolean dirty;
     struct ForcedUpdate {
-        bool enabled;
+        Switches::ForcedUpdateState state;
         byte decoder;
         byte channel;
     } forcedUpdate;
 } model;
 
 void Switches::sendForcedUpdates() {
-    model.forcedUpdate.enabled = true;
+    model.forcedUpdate.state = ARMED;
     model.forcedUpdate.channel = 0;
     model.forcedUpdate.decoder = 0;
 }
@@ -142,6 +142,11 @@ static void getForcedUpdateCommand(char* buffer) {
     }
     lastCall = millis();
 
+    if (model.forcedUpdate.state == Switches::ARMED) {
+        model.forcedUpdate.state = Switches::RUNNING;
+        return;
+    }
+
     byte* decoder = &model.forcedUpdate.decoder;
     byte* channel = &model.forcedUpdate.channel;
 
@@ -156,7 +161,7 @@ static void getForcedUpdateCommand(char* buffer) {
         *channel = 0;
         if (++*decoder == SWITCH_DECODER_COUNT) {
             *decoder = 0;
-            model.forcedUpdate.enabled = false;
+            model.forcedUpdate.state = Switches::IDLE;
         }
     }
 }
@@ -164,7 +169,7 @@ static void getForcedUpdateCommand(char* buffer) {
 void Switches::getNextCommand(char* buffer) {
     buffer[0] = '\0';
 
-    if (model.forcedUpdate.enabled) {
+    if (model.forcedUpdate.state != IDLE) {
         getForcedUpdateCommand(buffer);
     } else if (model.dirty) {
         getNormalCommand(buffer);
