@@ -6,6 +6,7 @@
 
 #include "switches.h"
 #include "signal.h"
+#include "exit_signal.h"
 
 namespace Logic {
     struct Config {
@@ -17,6 +18,7 @@ namespace Logic {
     union Data {
         Switches::Data switches;
         Signal::Data signal;
+        ExitSignal::Data exitSignal;
     };
     
     void init();

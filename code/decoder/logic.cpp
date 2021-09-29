@@ -9,7 +9,6 @@ void Logic::init() {
 
     switch(_chipConfig.type) {
         case ::Config::Type::LIGHT:
-        case ::Config::Type::EXIT:
             _logicConfig.init = Light::init;
             _logicConfig.process = Light::process;
             break;
@@ -22,6 +21,10 @@ void Logic::init() {
             _logicConfig.init = Signal::init;
             _logicConfig.process = Signal::process;
             _logicConfig.tick = Signal::tick;
+        case ::Config::Type::EXIT:
+            _logicConfig.init = ExitSignal::init;
+            _logicConfig.process = ExitSignal::process;
+            _logicConfig.tick = ExitSignal::tick;
     }
 
     if (_logicConfig.init != nullptr) {
