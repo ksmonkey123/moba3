@@ -1,0 +1,32 @@
+\documentclass{scrartcl}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[parfill]{parskip}
+\usepackage{amssymb}
+\usepackage{euler}
+\let\oldtitle\title
+\let\oldauthor\author
+\renewcommand{\title}[1]{\oldtitle{#1} \def\thetitle{#1}}
+\renewcommand{\author}[1]{\oldauthor{#1} \def\theauthor{#1}}
+\usepackage{fancyhdr}
+\renewcommand{\sectionmark}[1]{\rightmark{#1}}
+\fancyhead[L]{\thetitle}
+\fancyhead[C]{\theauthor}
+\fancyhead[R]{\sectionmark}
+\fancyfoot[C]{\thepage}
+\pagestyle{fancy}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ENTER TITLE AND AUTHOR HERE
+\title{Title}
+\author{Author}
+
+\begin{document}
+
+% CONTENT HERE
+test
+
+\end{document}
