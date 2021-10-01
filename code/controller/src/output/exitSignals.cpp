@@ -6,7 +6,7 @@
 
 static struct ExitSignalModel {
     struct ExitSignalDecoderState {
-        byte data;
+        SignalLevel channel[4];
         boolean dirty;
     } decoder[EXIT_SIGNAL_DECODER_COUNT];
 } model;
@@ -14,31 +14,38 @@ static struct ExitSignalModel {
 void ExitSignals::reset() {
     for (byte i = 0; i < EXIT_SIGNAL_DECODER_COUNT; i++) {
         auto decoder = model.decoder + i;
-        decoder->data = 0;
+        for (byte j = 0; j < 4; j++) {
+            decoder->channel[j] = HALT;
+        }
         decoder->dirty = false;
     }
 }
 
-void ExitSignals::setSignal(byte id, byte data, byte mask) {
-    auto dec = model.decoder + id - 1;
+void ExitSignals::setSignal(byte chipAddress, byte channelId, SignalLevel level) {
+    auto dec = model.decoder + chipAddress - 1;
+    auto channel = dec->channel + channelId;
 
-    byte newData = data & (mask ^ 0xff);
-    newData |= (data & mask);
-
-    if (dec->data != newData) {
-        dec->data = newData;
+    if (*channel != level) {
+        *channel = level;
         dec->dirty = true;
-        StatusLED::blink;
+        StatusLED::blink();
     }
 }
 
 static void generateCommand(byte decoderId, char* buffer) {
     buffer[0] = 'A';
     buffer[1] = '1' + decoderId;
-    buffer[2] = 's';
-    Util::byteToHex(model.decoder[decoderId].data, buffer + 3);
-    buffer[5] = '\n';
-    buffer[6] = '\0';
+
+    auto decoder = model.decoder + decoderId;
+
+    byte index = 2;
+    for (byte i = 0; i < 4; i++) {
+        buffer[index++] = 'a' + i;
+        buffer[index++] = '0' + decoder->channel[i];
+    }
+
+    buffer[index++] = '\n';
+    buffer[index] = '\0';
 }
 
 void ExitSignals::getNextCommand(char* buffer) {
@@ -46,7 +53,6 @@ void ExitSignals::getNextCommand(char* buffer) {
         auto dec = model.decoder + i;
         if (dec->dirty) {
             generateCommand(i, buffer);
-
             dec->dirty = false;
             return;
         }

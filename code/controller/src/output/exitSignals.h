@@ -2,10 +2,11 @@
 #define OUTPUT_EXIT_SIGNALS_H
 
 #include <Arduino.h>
+#include "signalLevel.h"
 
 namespace ExitSignals {
 
-    void setSignal(byte address, byte data, byte mask);
+    void setSignal(byte chipAddress, byte channel, SignalLevel level);
 
     void getNextCommand(char* buffer);
     void getRepetitionCommand(char* buffer);

@@ -8,8 +8,8 @@ enum SignalDirection { DISABLED, ENTRY, EXIT };
 
 enum SignalState { FB_0, FB_1, FB_2, FB_3 };
 
-extern EntrySignals::STATUS exitSignalsLeft[];
-extern EntrySignals::STATUS exitSignalsRight[];
+extern SignalLevel exitSignalsLeft[];
+extern SignalLevel exitSignalsRight[];
 
 namespace Station::Left {
     void refreshSignals();

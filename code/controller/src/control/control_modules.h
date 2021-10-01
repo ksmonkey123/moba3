@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+#include "../output/signalLevel.h"
 #include "../input/buttons.h"
 #include "../input/buttonMapping.h"
 #include "../output/switches.h"

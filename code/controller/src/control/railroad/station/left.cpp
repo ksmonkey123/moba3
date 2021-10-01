@@ -4,7 +4,7 @@
 static void tick(Timer*);
 static void upgrade(Timer*);
 
-EntrySignals::STATUS exitSignalsLeft[4];
+SignalLevel exitSignalsLeft[4];
 
 static Timer* upgradeTimer;
 
@@ -127,24 +127,24 @@ static void processSignals() {
     auto direction = paths[0].direction;
     memset(exitSignalsLeft, 0, sizeof(exitSignalsLeft));
 
-    byte data = 0;
     if (target >= 0 && direction == EXIT) {
         switch(target) {
             case 0:
             case 1:
-                exitSignalsLeft[target] = EntrySignals::SLOW_40;
+                exitSignalsLeft[target] = SignalLevel::SLOW_40;
                 break;
             case 2:
-                exitSignalsLeft[target] = EntrySignals::SLOW_60;
+                exitSignalsLeft[target] = SignalLevel::SLOW_60;
                 break;
             case 3:
-                exitSignalsLeft[target] = EntrySignals::FREE;
+                exitSignalsLeft[target] = SignalLevel::FREE;
                 break;
         }
-        data = 0x01 << target;
     }
 
-    ExitSignals::setSignal(EXIT_SIGNALS_L, data, 0x1f);
+    for(byte i = 0; i < 4; i++) {
+        ExitSignals::setSignal(EXIT_SIGNALS_L, i, exitSignalsLeft[i]);
+    }
     Station::Right::refreshSignals();
 }
 
@@ -153,17 +153,17 @@ void Station::Left::refreshSignals() {
     auto direction = paths[0].direction;
 
     if (target >= 0 && direction == ENTRY) {
-        EntrySignals::STATUS speed = EntrySignals::SLOW_40;
+        SignalLevel speed = SignalLevel::SLOW_40;
 
         if (target == 2) {
-            speed = EntrySignals::SLOW_60;
+            speed = SignalLevel::SLOW_60;
         } else if (target == 3) {
-            speed = exitSignalsRight[3] != EntrySignals::HALT ? EntrySignals::FREE : EntrySignals::SLOW_60;
+            speed = exitSignalsRight[3] != SignalLevel::HALT ? SignalLevel::FREE : SignalLevel::SLOW_60;
         }
 
         EntrySignals::setSignal(ENTRY_SIGNAL_LEFT, speed, exitSignalsRight[target]);
     } else {
-        EntrySignals::setSignal(ENTRY_SIGNAL_LEFT, EntrySignals::HALT, EntrySignals::HALT);
+        EntrySignals::setSignal(ENTRY_SIGNAL_LEFT, SignalLevel::HALT, SignalLevel::HALT);
     }
 }
 

@@ -6,8 +6,8 @@
 static struct EntrySignalModel {
     struct EntrySignalDecoderState {
         struct SignalStatus {
-            EntrySignals::STATUS primary;
-            EntrySignals::STATUS secondary;
+            SignalLevel primary;
+            SignalLevel secondary;
             boolean dirty;
         } channel[2];
         boolean dirty;
@@ -27,7 +27,7 @@ void EntrySignals::reset() {
     }
 }
 
-void EntrySignals::setSignal(byte id, EntrySignals::STATUS primary, EntrySignals::STATUS secondary) {
+void EntrySignals::setSignal(byte id, SignalLevel primary, SignalLevel secondary) {
     byte decoder = ((id & 0x70) >> 4) - 1;
     byte channel = (id & 0x07) - 1;
 

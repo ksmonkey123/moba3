@@ -4,7 +4,7 @@
 static void tick(Timer*);
 static void upgrade(Timer*);
 
-EntrySignals::STATUS exitSignalsRight[4];
+SignalLevel exitSignalsRight[4];
 
 struct Path {
     int8_t target;
@@ -37,8 +37,9 @@ static void resetInner() {
     Switches::setSwitch(SWITCH_RIGHT_1, Switches::UNKNOWN);
     Switches::setSwitch(SWITCH_RIGHT_4, Switches::UNKNOWN);
     Switches::setSwitch(SWITCH_RIGHT_5, Switches::UNKNOWN);
-    EntrySignals::setSignal(ENTRY_SIGNAL_R_INNER, EntrySignals::HALT, EntrySignals::HALT);
-    ExitSignals::setSignal(EXIT_SIGNALS_R, 0x00, 0x03);
+    EntrySignals::setSignal(ENTRY_SIGNAL_R_INNER, SignalLevel::HALT, SignalLevel::HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_R, 0, HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_R, 1, HALT);
     Display::set(4, 0x00, 0x0f);
     Display::set(5, 0x00, 0x30);
     if (isCrossed) {
@@ -52,8 +53,9 @@ static void resetOuter() {
     Switches::setSwitch(SWITCH_RIGHT_2, Switches::UNKNOWN);
     Switches::setSwitch(SWITCH_RIGHT_3, Switches::UNKNOWN);
     Switches::setSwitch(SWITCH_RIGHT_6, Switches::UNKNOWN);
-    EntrySignals::setSignal(ENTRY_SIGNAL_R_OUTER, EntrySignals::HALT, EntrySignals::HALT);
-    ExitSignals::setSignal(EXIT_SIGNALS_R, 0x00, 0x1c);
+    EntrySignals::setSignal(ENTRY_SIGNAL_R_OUTER, SignalLevel::HALT, SignalLevel::HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_R, 2, HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_R, 3, HALT);
     Display::set(4, 0x00, 0xf0);
     Display::set(5, 0x00, 0xc0);
     if (isCrossed) {
@@ -154,28 +156,26 @@ static void processDisplay() {
 
 }
 
-static void processExitSignal(byte exit, byte track, byte* data) {
+static void processExitSignal(byte exit, byte track) {
     if (track == 3 && exit == 1) {
-        exitSignalsRight[3] = EntrySignals::SLOW_60;
-        *data |= 0x10;
+        exitSignalsRight[3] = SignalLevel::SLOW_60;
     } else {
-        exitSignalsRight[track] = EntrySignals::SLOW_40;
-        *data |= 0x01 << track;
+        exitSignalsRight[track] = SignalLevel::SLOW_40;
     }
 }
 
 void Station::Right::refreshSignals() {
     // build entry signals
     if (innerPath.target >= 0 && innerPath.direction == ENTRY) {
-        EntrySignals::setSignal(ENTRY_SIGNAL_R_INNER, EntrySignals::SLOW_40, exitSignalsLeft[innerPath.target]);
+        EntrySignals::setSignal(ENTRY_SIGNAL_R_INNER, SignalLevel::SLOW_40, exitSignalsLeft[innerPath.target]);
     } else {
-        EntrySignals::setSignal(ENTRY_SIGNAL_R_INNER, EntrySignals::HALT, EntrySignals::HALT);
+        EntrySignals::setSignal(ENTRY_SIGNAL_R_INNER, SignalLevel::HALT, SignalLevel::HALT);
     }
 
     if (outerPath.target >= 0 && outerPath.direction == ENTRY) {
-        EntrySignals::setSignal(ENTRY_SIGNAL_R_OUTER, outerPath.target == 3 ? EntrySignals::SLOW_60 : EntrySignals::SLOW_40, exitSignalsLeft[outerPath.target]);
+        EntrySignals::setSignal(ENTRY_SIGNAL_R_OUTER, outerPath.target == 3 ? SignalLevel::SLOW_60 : SignalLevel::SLOW_40, exitSignalsLeft[outerPath.target]);
     } else {
-        EntrySignals::setSignal(ENTRY_SIGNAL_R_OUTER, EntrySignals::HALT, EntrySignals::HALT);
+        EntrySignals::setSignal(ENTRY_SIGNAL_R_OUTER, SignalLevel::HALT, SignalLevel::HALT);
     }
 }
 
@@ -185,15 +185,16 @@ static void processSignals() {
     // build exit signals
     memset(exitSignalsRight, 0, sizeof(exitSignalsRight));
 
-    byte data = 0;
     if (innerPath.target >= 0 && innerPath.direction == EXIT) {
-        processExitSignal(0, innerPath.target, &data);
+        processExitSignal(0, innerPath.target);
     }
     if (outerPath.target >= 0 && outerPath.direction == EXIT) {
-        processExitSignal(1, outerPath.target, &data);
+        processExitSignal(1, outerPath.target);
     }
 
-    ExitSignals::setSignal(EXIT_SIGNALS_R, data, 0x1f);
+    for (byte i = 0; i < 4; i++) {
+        ExitSignals::setSignal(EXIT_SIGNALS_R, i, exitSignalsRight[i]);
+    }
     Station::Left::refreshSignals();
 }
 
