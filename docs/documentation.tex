@@ -325,6 +325,35 @@ This limitation is primarily introduced to ensure that no command payload contai
 These could be incorrectly interpreted by a decoder as the start of a command line.
 The list of allowed characters may be expanded in future revisions.
 
+\subsection{Button Event}
+The IOIB continuously monitors the states of all push buttons on the control panel.
+Whenever a change in a button state is detected, a corresponding \emph{button event} is sent from the IOIB to the CTRB.
+
+Each button has a 1 byte \emph{button address} ($addr$).
+As the third character, a \emph{direction identifier} ($dir$) is sent.
+When a new button is pressed, a \emph{key-down} event is sent, when a button is released, a \emph{key-up} event is sent.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |l|l|l| } 
+\multicolumn{1}{l}{0..1} & \multicolumn{1}{l}{2} & \multicolumn{1}{l}{3} \\ \hline
+$HEX(addr)$ & $dir$ & \texttt{\textbackslash{}n} \\\hline
+\end{tabular}
+\caption{button event data structure}
+\end{table}
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |l|l| } 
+\hline
+event type     & $dir$ \\\hline\hline
+\emph{key-down} event & \texttt{+} \\\hline
+\emph{key-up} event   & \texttt{-} \\\hline
+\end{tabular}
+\caption{button event direction identifiers}
+\end{table}
+
+
+
 \chapter{Circuit Boards}
 \section{Controller}
 \section{I/O Interface}
