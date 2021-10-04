@@ -9,6 +9,11 @@
 \usepackage{euler}
 \usepackage{xparse}
 
+
+\counterwithout{footnote}{chapter}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
 \title{Moba3 Control System}
 \subtitle{System Documentation}
 \author{Andreas Wälchli}
@@ -43,7 +48,7 @@ Each packet contained a single \emph{even parity bit} was packed between start a
 \centering
 \begin{tabular}{ | c | c | c | c | }
 \hline
-$START$ & $data0..7$ & $parity_0(data)$ & $END$ \\\hline
+$START$ & $data_{0..7}$ & $parity_0(data)$ & $END$ \\\hline
 \end{tabular}
 \caption{Packet structure}
 \end{table}
@@ -352,14 +357,172 @@ event type     & $dir$ \\\hline\hline
 \caption{button event direction identifiers}
 \end{table}
 
-
-
 \chapter{Circuit Boards}
-\section{Controller}
-\section{I/O Interface}
+At the moment there are 4 board designs in use:
+The \emph{controller board} (CTRB), the \emph{I/O Interface Board} (IOIB), a \emph{general purpose decoder board} and the \emph{switch decoder board}.
+The general purpose decoder board is used for all signal decoders and for light decoders.
+All boards have many similarities in component selection, circuitry and routing.
+
+\section{Controller Board}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{controller}
+    \caption{controller board (CTRB)}
+    \label{fig:ctrb}
+\end{figure}
+
+The \emph{controller board} (CTRB) is the simplest of the PCB designs currently in use.
+It only contains a power connector (\texttt{POWER1}), a microcontroller with the associated circuitry and 2 RJ45 connectors with their corresponding transceiver chips.
+\texttt{J2} is a mirrored AVR-ICP-6\footnote{in-circuit programming connector used for AVR microprocessors} connector:
+The pinout matches a standard AVR-ICP-6 interface, but the top and bottom rows are flipped.\footnote{The bottom-up view of the standard AVR-ICP-6 connector matches to the top-down view of this one.}
+
+Each RJ45 connector is used for one of the two busses:
+\texttt{J4} provides a connection to the \emph{local bus}.
+\texttt{J5} is used for the \emph{remote bus}.
+It is recommended that this board is always externally powered to provide a power injection point for both busses.
+
+\section{I/O Interface Board}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{interface}
+    \caption{I/O interface board (IOIB)}
+\end{figure}
+
+The \emph{I/O interface board} (IOIB) monitors the push-buttons and drives the LEDs of the control panel.
+
+The \texttt{POWER1} and \texttt{J2} connector are identical to those on the CTRB.
+The singular RJ45 connector \texttt{J4} connects to the \emph{local bus}.
+The remaining connectors handle \emph{input} and \emph{output}.
+
+\subsection{Input Connectors}
+The control panel buttons are divided into 4 sectors of up to 16 buttons each.
+The IOIB regularly scans all 4 sectors individually.
+
+The buttons need to be wired in a very specific way:
+Each sector has a common \emph{feed pin}.
+One terminal of all buttons in one sector needs to be tied to this \emph{feed pin}.
+The second terminal is connected to one of the 16 \emph{sense pins} through a series diode.
+This diode needs to be oriented with the anode connected to the button and the cathode to the sense pin.
+This arrangement leads to a button matrix where for every combination of feed pin sense pin there is exactly one button between these two.
+That way when powering the feed pin of one sector the sense pins of all currently pressed buttons of that sector are powered.
+
+The 4-pin connector \texttt{J1} exposes the 4 feed pins for the 4 sectors.
+The 16-pin connector \texttt{J3} exposes the 16 sense pins.
+All pins of \texttt{J3} require an external pull-down resistor:
+The sense pins do posses some stray capacitance.
+Due to the diode arrangement residual charges may not dissipate sufficiently quickly through leakage currents alone.
+A relatively high resistance\footnote{about $10k\Omega$ should work fine} should be used to not overload the button diodes.
+
+\subsubsection{Button Addressing}
+The following simple formula provides a simple way to calculate the button address from a combination of a feed pin and a sense pin:
+\[addr = 16 * (feed - 1) + sense - 1\]
+
+Example:
+Button 4 of sector 2 would have the button id $0x13$.\footnote{pin numbers are 1-indexed}
+
+\subsection{Output Connectors}
+The remaining connectors (\texttt{J5}, \texttt{J6} and \texttt{J7}) handle \emph{output} - \emph{i.e.} the control panel LEDs.
+Each connector provides signals for 16 LEDs.
+These pins are directly connected to the 74HC595 shift registers.
+While low-power devices could be directly connected to these digital pins it is recommended to use these pins only to drive the gates on external NMOS transistors.
+In that configuration the NMOS does not require a pull-down resistor on the gate pin as the IOIB pins are always actively driven.
+
+The 3 connectors are arranged in software as 6 bytes of data.
+\texttt{J5} exposes the 2 least significant bytes while \texttt{J7} exposes the 2 most significant bytes.
+On each connector pin 1 is the least significant bit of the less significant byte.
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |c|c|c|c|c|c| } \hline
+\multicolumn{2}{ |c| }{\texttt{J5}} & \multicolumn{2}{ |c| }{\texttt{J6}} & \multicolumn{2}{ |c| }{\texttt{J7}} \\\hline
+pins 1-8 & pins 9-16 & pins 1-8 & pins 9-16 & pins 1-8 & pins 9-16  \\\hline\hline
+$data_0$ & $data_1$  & $data_2$  & $data_3$  & $data_4$  & $data_5$ \\\hline
+\end{tabular}
+\caption{output pin assignments}
+\end{table}
+
+\pagebreak
 \section{Decoder Boards}
+The decoder boards share much of the basic hardware.
+Specifically the power connector, the programming header and the 2 RJ45 connectors are all arranged identically on all decoders.
+Also the microprocessor and all basic support components share common placement and trace routing.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.4\textwidth]{decoder_general}
+    \caption{common area of decoder PCBs}
+\end{figure}
+
+On the decoder boards the 2 RJ45 connectors are used for daisy chaining the \emph{remote} bus.
+The connector \texttt{J4} is used as the \emph{input} - \emph{i.e.} the connection to the CTRB or a \emph{previous} board.
+The second connector - \texttt{J5} - is the \emph{output}.
+This connector is used to connect to the \emph{next} board in the chain.
+At the last board in the chain this connector can simply be left disconnected and no bus termination is required.
+
+The power connector (\texttt{POWER1}) can be used to externally power the decoder and to provide power to the bus.
+On low-power boards it can be left unpopulated or disconnected.
+
+The 6-channel DIP-switch \texttt{SW1} can be used to provide configuration data to the microprocessor.
+This could - for example - be used to configure the decoder type and address.
+The header is provided on all decoders but is not required to be populated if not needed by a decoder.
+
+Please note that the mounting holes are plated and the plating is connected to the ground plane of the board.
+To ensure balanced currents on the bus power wires it is recommended to ensure that the mounting screws - and thereby the mounting holes - remain electrically isolated from any external ground connection on boards that are bus powered.
+On externally powered boards this isolation is not required.
+
+\pagebreak
 \subsection{General Purpose Decoder}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{common_decoder}
+    \caption{general purpose decoder board}
+\end{figure}
+
+Many functions of the control system require simple digital - or low-power - pins.
+The \emph{general purpose decoder} provides a generic hardware platform for all these uses.
+It is the simplest of the decoder boards and is used for all signal decoders and for lighting.
+This board exposes up to 16 pins that are directly wired to the parallel output of two 74HC595 shift registers.
+The pins do have tri-state support.
+This feature can of course be controlled by the individual decoder software.
+
+The connectors \texttt{J1} and \texttt{J3} expose the 16 output pins.
+\texttt{J1} holds the first 8 pins, \texttt{J3} the rest.
+In a situation where less than 9 pins are used the header \texttt{J3} and 
+the shift register \texttt{U10} can remain unpopulated.
+When using the output pins to directly power external components it must be ensured that each pin does not exceed the maximum pin current and each connector does not exceed the maximum port current for the specific shift register used.
+Power usage should probably be kept below $10mA$ per pin.
+
+In some situation the output pins may be used as open collectors to power low power devices (\emph{e.g.} LEDs).
+These do require a power supply.
+If the board is bus-powered the power supply to the external devices should also be taken from the board to keep the currents through the power cables on the bus balanced.
+The power may either be taken from the \texttt{POWER1} connector or from the auxiliary pin \texttt{J6} which is also connected to the 5V rail of the board.
+
+\pagebreak
 \subsection{Switch Decoder}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{switch_decoder}
+    \caption{switch decoder board}
+\end{figure}
+
+Currently the only decoder type with bespoke hardware is the switch decoder.
+Each switch decoder allows control of up to 6 switches.
+
+\texttt{J1} and \texttt{J3} provide open collector connections for 3 switches each.
+The first pin of each switch should always be connected to the motor pole that pulls the switch into the \emph{straight-through} position.
+
+Each pin is switched to ground through an NMOS transistor with a MOSFET driver IC to minimise switching times.
+In addition each pin is also connected to a flyback diode.
+Switch motors are usually inductive loads and when switching of a motor pole a voltage spike may occur that could be destructive to the switching transistor.
+The on-board Schottky diodes protect the diodes from any such voltage spikes.
+
+For the flyback diodes to work properly a connection to the power supply voltage of the switches is required.
+The usually unused third pin of the power connector (\texttt{POWER1}) is connected to the cathode of all flyback diodes.
+It should be connected to the 24V power rail powering the switches.
+Where possible all switches and the decoder should be powered from a single connection - or at least as close to each other as feasible - to the 24V rail.
+
+If a decoder does not control 6 switches, the components for any unused connections can remain unpopulated.
+A single switch is driven by one dual-channel MOSFET driver with one pull-down resistor per channel and two NMOS transistors with a flyback diode each.
+
 
 \chapter{Decoder Command Specification}
 
