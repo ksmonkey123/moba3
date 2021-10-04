@@ -117,7 +117,7 @@ All boards should use the same microcontroller type and common areas of the PCBs
 Different decoder types should also share as much hardware as possible.
 Care must be taken that this not lead to an overly unified PCB design that tries to cover all possible use cases.
 But where external connectivity requirements are shared between multiple decoder types it shall be attempted to use common hardware.
-Behavioural distinctiveness should - where possible - be provided through software only.
+Behavioural distinctiveness should -- where possible -- be provided through software only.
 
 \subsubsection{Ease of Develoment}
 The microcontroller type chosen should allow for easy software development in C/C++.
@@ -177,8 +177,7 @@ This makes it useful for \emph{serial-to-parallel} data output.
 Both shift registers can be read and written using SPI hardware in mode $(0,0)$.
 
 \section{Data Bus Specification}
-The \textsc{Moba3} control system is based on a UART serial bus with a baudrate of 9600.
-\footnote{higher baudrates up to 2 Mbaud are theoretically possible}
+The \textsc{Moba3} control system is based on a UART serial bus with a baudrate of 9600.\footnote{higher baudrates up to 2 Mbaud are theoretically possible}
 The data is transmitted over differential pairs on an RS422/RS485 derived serial bus.
 The differential pairs are driven using MAX481 compatible transceivers operating at 5V.
 Physically the data bus uses 8P8C (RJ45) connections for both power (5V only) and data.
@@ -191,17 +190,15 @@ These should \emph{always} use external power delivery.
 Any externally powered decoder also provides power to the bus.
 The current draw on a single connection in the bus is limited to 600mA.
 Care must be taken to ensure that no bus segment exceeds this limit.
-This can be solved either by introducing additional external power connections where required or by simply connecting decoders strategically.
-E.g. alternating high-current decoders and low current decoders.
-In a scenario where a single bus powered decoder is connected between 2 externally powered decoders that bus powered decoder could theoretically pull up to 1.2A assuming equal cable lengths.
-\footnote{The resistance of each cable depends on the cable length.
+This can be solved either by introducing additional external power connections where required or by simply connecting decoders strategically -- \emph{e.g.} alternating high-current decoders and low current decoders.
+In a scenario where a single bus powered decoder is connected between 2 externally powered decoders that bus powered decoder could theoretically pull up to 1.2A assuming equal cable lengths.\footnote{The resistance of each cable depends on the cable length.
 When mismatched cable lengths are used it must be ensured that no single cable exceeds the 600mA limit.
 If e.g. one cable is 1m long and the other one 2m long, $2/3$ of the current will flow through the 1m long cable.
 In that scenario the entire structure would be limited to 900mA.
 In general if the cable lengths differ by a factor $n$, the current limit would be $(n+1)/n * 600mA$.}
 
 \subsubsection {Bus Loading and Biasing}
-In a deviation from the RS422 specification the bus does not need to be terminated. Each decoder loads the differential pair with a $10k\Omega$ resistor. This loading introduces a theoretical limit on the number of supported decoders to around 150. But this is very obviously only a theoretical limit and does not need to be considered further. In case the system should be used for an application with more than around 100 decoders, we suggest the introduction active repeaters.
+In a deviation from the RS422 specification the bus does not need to be terminated. Each decoder loads the differential pair with a $10k\Omega$ resistor. This loading introduces a theoretical limit on the number of supported decoders to around 150. But this is very obviously only a theoretical limit and does not need to be considered further. In case the system should be used for an application with more than around 100 decoders we suggest the introduction active repeaters.
 
 The differential pair is also not biased. The loading resistor equalises the voltage potential in the differential pair on disconnected decoders. The MAX481 transceiver will always read equal voltages as a logical $0$. The transmitters are always powered. For situations where the busses are correctly connected biasing becomes irrelevant as the transmitters will always drive the differential pair.
 
@@ -286,7 +283,7 @@ The display data ($data$) is treated as a single 6 bytes long unsigned integer.
 \subsection{Decoder Command}
 Decoder commands start with a \emph{type selector} ($type$) and a \emph{decoder address} ($addr$).
 After this common prefix a decoder specific payload of arbitrary length can follow.
-The command is terminated - as always - with a line break.
+The command is terminated -- as always -- with a line break.
 While theoretically arbitrary, the payload length should not exceed 12 characters.
 \begin{table}[h!]
 \centering
@@ -453,8 +450,8 @@ Also the microprocessor and all basic support components share common placement 
 \end{figure}
 
 On the decoder boards the 2 RJ45 connectors are used for daisy chaining the \emph{remote} bus.
-The connector \texttt{J4} is used as the \emph{input} - \emph{i.e.} the connection to the CTRB or a \emph{previous} board.
-The second connector - \texttt{J5} - is the \emph{output}.
+The connector \texttt{J4} is used as the \emph{input} -- \emph{i.e.} the connection to the CTRB or a \emph{previous} board.
+The second connector -- \texttt{J5} -- is the \emph{output}.
 This connector is used to connect to the \emph{next} board in the chain.
 At the last board in the chain this connector can simply be left disconnected and no bus termination is required.
 
@@ -462,11 +459,11 @@ The power connector (\texttt{POWER1}) can be used to externally power the decode
 On low-power boards it can be left unpopulated or disconnected.
 
 The 6-channel DIP-switch \texttt{SW1} can be used to provide configuration data to the microprocessor.
-This could - for example - be used to configure the decoder type and address.
+This could -- for example -- be used to configure the decoder type and address.
 The header is provided on all decoders but is not required to be populated if not needed by a decoder.
 
 Please note that the mounting holes are plated and the plating is connected to the ground plane of the board.
-To ensure balanced currents on the bus power wires it is recommended to ensure that the mounting screws - and thereby the mounting holes - remain electrically isolated from any external ground connection on boards that are bus powered.
+To ensure balanced currents on the bus power wires it is recommended to ensure that the mounting screws -- and thereby the mounting holes -- remain electrically isolated from any external ground connection on boards that are bus powered.
 On externally powered boards this isolation is not required.
 
 \pagebreak
@@ -477,7 +474,7 @@ On externally powered boards this isolation is not required.
     \caption{general purpose decoder board}
 \end{figure}
 
-Many functions of the control system require simple digital - or low-power - pins.
+Many functions of the control system require simple digital -- or low-power -- pins.
 The \emph{general purpose decoder} provides a generic hardware platform for all these uses.
 It is the simplest of the decoder boards and is used for all signal decoders and for lighting.
 This board exposes up to 16 pins that are directly wired to the parallel output of two 74HC595 shift registers.
@@ -518,7 +515,7 @@ The on-board Schottky diodes protect the diodes from any such voltage spikes.
 For the flyback diodes to work properly a connection to the power supply voltage of the switches is required.
 The usually unused third pin of the power connector (\texttt{POWER1}) is connected to the cathode of all flyback diodes.
 It should be connected to the 24V power rail powering the switches.
-Where possible all switches and the decoder should be powered from a single connection - or at least as close to each other as feasible - to the 24V rail.
+Where possible all switches and the decoder should be powered from a single connection -- or at least as close to each other as feasible -- to the 24V rail.
 
 If a decoder does not control 6 switches, the components for any unused connections can remain unpopulated.
 A single switch is driven by one dual-channel MOSFET driver with one pull-down resistor per channel and two NMOS transistors with a flyback diode each.
