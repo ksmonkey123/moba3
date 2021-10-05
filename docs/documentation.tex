@@ -1,6 +1,7 @@
 \documentclass{scrreprt}
 \usepackage{geometry}
 \geometry{a4paper}
+
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[parfill]{parskip}
@@ -9,28 +10,46 @@
 \usepackage{euler}
 \usepackage{xparse}
 
-
 \counterwithout{footnote}{chapter}
 \usepackage{graphicx}
-\graphicspath{ {./images/} }
+\graphicspath{ {./images} }
 
-\title{Moba3 Control System}
-\subtitle{System Documentation}
+\title{MOBA3 Control System}
+\subtitle{System Design Specification and Documentation}
 \author{Andreas Wälchli}
+
+\hyphenation{trans-ceiver}
+\hyphenation{trans-ceivers}
+
+\newcommand\n{\char`\\n}
 
 \begin{document}
 \maketitle
 
-\tableofcontents{}
+\tableofcontents
 
 \chapter{Introduction}
+The \textsc{Moba3} control system is designed as a replacement for previous control systems.
+This upgrade is a complete rework and removes all legacy components from previous versions.
+Such a step is obviously not taken without careful consideration.
+
+This document outlines the history of the \textsc{Moba} control systems and presents the rationale behind the move to a completely new system.
+It also presents the design goals for the new \textsc{Moba3} system.
+Finally it serves as a full specification and documentation of both the hardware and software.
+
+The documentation does not provide detailed information about the software implementation.
+It only aims to specify the communications interfaces.
+Details about software internals and precise decoder operation are deliberately excluded.
+
+
+
 \section{Historical Context}
 During the construction of the current model railway the decision was made to use traditional analog control for the trains.
 Many models were not yet equipped with digital decoders and a retrofit would have been exceedingly expensive.
 Since no industry standard digital solution was used for the train control, the decision was made to design and construct a custom digital control solution for all other components of the railway.
 This solution would provide push button based control from a schematic control board to control all switches, signals and all lighting.
 
-\subsection{Moba1}
+\subsection{MOBA1}
 A first design used custom control and decoder boards based on the PIC16F527 microcontroller.
 The entire railway was divided into 5 sectors:
 
@@ -44,7 +63,8 @@ The data also had to be encoded very efficiently to fit the fixed-length packet.
 The sector \emph{right entry to main station} for example controlled 6 switches, 2 entry signals, 4 exit signals and could drive up to 2 independent paths at once.
 
 Each packet contained a single \emph{even parity bit} was packed between start and end marker bits:
-\begin{table}[h!]
+
+\begin{table}[ht!]
 \centering
 \begin{tabular}{ | c | c | c | c | }
 \hline
@@ -54,8 +74,9 @@ $START$ & $data_{0..7}$ & $parity_0(data)$ & $END$ \\\hline
 \end{table}
 
 
-Transmission was done over a custom unshielded single-ended single-wire data bus with a relatively low baudrate and every bit of data was transmitted over 3 bus clock cycles. 
-\begin{table}[h!]
+Transmission was done over a custom unshielded single-ended single-wire data bus with a relatively low baudrate and every bit of data was transmitted over 3 bus clock cycles.
+
+\begin{table}[ht!]
 \centering
 \begin{tabular}{ | r | l | }
 \hline
@@ -68,7 +89,7 @@ $END$   & $111$ \\\hline
 \caption{bit encoding}
 \end{table}
 
-\subsection{Moba2}
+\subsection{MOBA2}
 During construction and testing of the first system it became clear that this was highly limited:
 Each sector had its own \emph{master} board and these were not able to exchange any data.
 Additionally programs for the PIC16F527 microcontroller needed to be written in MIPS Assembly, which made high-level software design difficult.
@@ -96,7 +117,7 @@ In the end we were forced to introduce a self-calibration routine that would cal
 This routine would run at every startup and whenever the decoder had too many transmission errors.
 The issues of transmission errors could however never be completely solved.
 
-\section{Moba3}
+\section{MOBA3}
 The issues outlined above eventually lead to the decision to introduce a full redesign before the model railway was completed.
 This new solution would be designed with EMI-resistance in mind from the beginning.
 It would make away with the sector concept and the state transmissions.
@@ -204,7 +225,8 @@ The differential pair is also not biased. The loading resistor equalises the vol
 
 \subsection{Local Bus Specification}
 The \emph{local bus} is a full-duplex bus used for communication between the central CTRB and the IOIB that manages I/O on the control panel. 2 differential pairs are used for bidirectional data transmission, the remaining 2 are used for power.
-\begin{table}[h!]
+
+\begin{table}[ht!]
 \centering
 \begin{tabular}{ |r|l|l|l| }
 \hline
@@ -226,7 +248,7 @@ The \emph{local bus} is a a direct connection bus between the CTRB and the IOIB 
 \subsection{Remote Bus Specification}
 The \emph{remote bus} is a simplex bus used for communication between the CTRB and the decoders. The decoders are connected using daisy chaining. It only carries data from the CTRB to the decoders. The differential pair used for IOIB transmissions on the \emph{local bus} is used for connection sensing on the \emph{remote bus}: Each decoder feeds back power through this pair to the previous board in the chain. This allows for easy identification of a break in the chain. It also ensures that in case a decoder is connected to the \emph{local port} the CTRB is presented with a permanently idle IOIB transmission channel.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \begin{tabular}{ |r|l|l|l| }
 \hline
@@ -247,7 +269,7 @@ Please note that it is not required for the controller transmission channels for
 
 \section{Data Transmission Format}
 Unlike the previous systems \textsc{Moba3} transmits \emph{commands}, not \emph{states}. All commands follow a common structure, but each decoder type defines its own \emph{payload semantics}. It is however generally required that all commands are human readable and restricted to the printable ASCII character set.
-Each command is transmitted as a \emph{line} terminated by a line break (\texttt{\textbackslash{}n}) character.
+Each command is transmitted as a \emph{line} terminated by a line break (\texttt{\n}) character.
 
 There are 3 line formats:
 \emph{display command} and \emph{decoder command} lines are transmitted by the CTRB.
@@ -271,25 +293,28 @@ This is followed by a 12 character hexadecimal encoding of the 48-bit display da
 Each bit of the display data directly corresponds to a single LED on the control board.
 The display data ($data$) is treated as a single 6 bytes long unsigned integer.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \begin{tabular}{ |l|l|l| } 
 \multicolumn{1}{l}{0} & \multicolumn{1}{l}{1..12} & \multicolumn{1}{l}{13} \\ \hline
-\texttt{D} & $HEX(data)$ & \texttt{\textbackslash{}n} \\\hline
+\texttt{D} & $HEX(data)$ & \texttt{\n} \\\hline
 \end{tabular}
 \caption{display command structure}
 \end{table}
+
+Example: \texttt{D012436fdea12\n}
 
 \subsection{Decoder Command}
 Decoder commands start with a \emph{type selector} ($type$) and a \emph{decoder address} ($addr$).
 After this common prefix a decoder specific payload of arbitrary length can follow.
 The command is terminated -- as always -- with a line break.
 While theoretically arbitrary, the payload length should not exceed 12 characters.
+
 \begin{table}[h!]
 \centering
 \begin{tabular}{ |l|l|l|l| } 
 \multicolumn{1}{l}{0} & \multicolumn{1}{l}{1} & \multicolumn{1}{l}{2..n+2} & \multicolumn{1}{l}{n+3} \\ \hline
-$type$ & $HEX(addr)_0$ & $payload$ & \texttt{\textbackslash{}n} \\\hline
+$type$ & $HEX(addr)_0$ & $payload$ & \texttt{\n} \\\hline
 \end{tabular}
 \caption{decoder command structure}
 \end{table}
@@ -298,7 +323,8 @@ $type$ & $HEX(addr)_0$ & $payload$ & \texttt{\textbackslash{}n} \\\hline
 The type selector indicates the decoder type the command is relevant for.
 Each decoder type has a unique type selector associated with it.
 Type selectors are always capital letters.
-\begin{table}[h!]
+
+\begin{table}[ht!]
 \centering
 \begin{tabular}{ |l|l| }
 \hline
@@ -339,7 +365,7 @@ When a new button is pressed, a \emph{key-down} event is sent, when a button is 
 \centering
 \begin{tabular}{ |l|l|l| } 
 \multicolumn{1}{l}{0..1} & \multicolumn{1}{l}{2} & \multicolumn{1}{l}{3} \\ \hline
-$HEX(addr)$ & $dir$ & \texttt{\textbackslash{}n} \\\hline
+$HEX(addr)$ & $dir$ & \texttt{\n} \\\hline
 \end{tabular}
 \caption{button event data structure}
 \end{table}
@@ -354,11 +380,17 @@ event type     & $dir$ \\\hline\hline
 \caption{button event direction identifiers}
 \end{table}
 
+Examples: \texttt{23+\n}, \texttt{1a-\n}
+
 \chapter{Circuit Boards}
 At the moment there are 4 board designs in use:
 The \emph{controller board} (CTRB), the \emph{I/O Interface Board} (IOIB), a \emph{general purpose decoder board} and the \emph{switch decoder board}.
 The general purpose decoder board is used for all signal decoders and for light decoders.
 All boards have many similarities in component selection, circuitry and routing.
+
+All boards use a 3 pin power connector.
+Usually only pins 1 and 2 are used for ground and 5V respectively.
+Pin 3 can be used to provide an additional voltage to the board.
 
 \section{Controller Board}
 \begin{figure}[h!]
@@ -371,7 +403,7 @@ All boards have many similarities in component selection, circuitry and routing.
 The \emph{controller board} (CTRB) is the simplest of the PCB designs currently in use.
 It only contains a power connector (\texttt{POWER1}), a microcontroller with the associated circuitry and 2 RJ45 connectors with their corresponding transceiver chips.
 \texttt{J2} is a mirrored AVR-ICP-6\footnote{in-circuit programming connector used for AVR microprocessors} connector:
-The pinout matches a standard AVR-ICP-6 interface, but the top and bottom rows are flipped.\footnote{The bottom-up view of the standard AVR-ICP-6 connector matches to the top-down view of this one.}
+The pinout nearly matches a standard AVR-ICP-6 interface, but the top and bottom rows are swapped.
 
 Each RJ45 connector is used for one of the two busses:
 \texttt{J4} provides a connection to the \emph{local bus}.
@@ -510,17 +542,29 @@ The first pin of each switch should always be connected to the motor pole that p
 Each pin is switched to ground through an NMOS transistor with a MOSFET driver IC to minimise switching times.
 In addition each pin is also connected to a flyback diode.
 Switch motors are usually inductive loads and when switching of a motor pole a voltage spike may occur that could be destructive to the switching transistor.
-The on-board Schottky diodes protect the diodes from any such voltage spikes.
+The on-board high-current schottky diodes protect the transistors from any such voltage spikes.
 
-For the flyback diodes to work properly a connection to the power supply voltage of the switches is required.
-The usually unused third pin of the power connector (\texttt{POWER1}) is connected to the cathode of all flyback diodes.
+A connection to the power supply voltage of the switches is required for the flyback diodes to work properly.
+The generally unused third pin of the power connector (\texttt{POWER1}) is connected to the cathode of all flyback diodes.
 It should be connected to the 24V power rail powering the switches.
-Where possible all switches and the decoder should be powered from a single connection -- or at least as close to each other as feasible -- to the 24V rail.
+Failure to connect the 24V rail could lead to destructive failure of the NMOS transistors due to the drain-source voltage exceeding its limit.
+For this reason it is recommended to verify a stable connection upon installation.
+A voltage measurement between the cathode of any flyback diode and an exposed mounting hole plating can be used for this purpose.
 
 If a decoder does not control 6 switches, the components for any unused connections can remain unpopulated.
 A single switch is driven by one dual-channel MOSFET driver with one pull-down resistor per channel and two NMOS transistors with a flyback diode each.
 
-
 \chapter{Decoder Command Specification}
+Each decoder type has its own command structure.
+These decoder command structures in essence define an \emph{instruction set} of instructions sent from the CTRB to the decoders to control the model railway.
+The following sections provide detailed specifications for all currently supported commands.
+
+\section{Switch Commands}
+
+\section{Exit Signal Commands}
+
+\section{Entry Signal Commands}
+
+\section{Lighting Commands}
 
 \end{document}
