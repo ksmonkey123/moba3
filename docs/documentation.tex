@@ -15,13 +15,17 @@
 \graphicspath{ {./images} }
 
 \title{MOBA3 Control System}
-\subtitle{System Design Specification and Documentation}
+\subtitle{Model Railway Control System\\System Design Specification and Documentation\\Revision A}
 \author{Andreas Wälchli}
 
 \hyphenation{trans-ceiver}
 \hyphenation{trans-ceivers}
 
 \newcommand\n{\char`\\n}
+\newcommand\ie{\emph{i.e. }}
+\newcommand\eg{\emph{e.g. }}
+
+
 
 \begin{document}
 \maketitle
@@ -40,8 +44,6 @@ Finally it serves as a full specification and documentation of both the hardware
 The documentation does not provide detailed information about the software implementation.
 It only aims to specify the communications interfaces.
 Details about software internals and precise decoder operation are deliberately excluded.
-
-
 
 \section{Historical Context}
 During the construction of the current model railway the decision was made to use traditional analog control for the trains.
@@ -81,10 +83,10 @@ Transmission was done over a custom unshielded single-ended single-wire data bus
 \begin{tabular}{ | r | l | }
 \hline
 encoded bit & transmitted sequence \\\hline\hline
-$START$ & $000$ \\\hline
-$0$     & $100$ \\\hline
-$1$     & $110$ \\\hline
-$END$   & $111$ \\\hline
+$START$ & \texttt{000} \\\hline
+$0$     & \texttt{100} \\\hline
+$1$     & \texttt{110} \\\hline
+$END$   & \texttt{111} \\\hline
 \end{tabular}
 \caption{bit encoding}
 \end{table}
@@ -211,7 +213,7 @@ These should \emph{always} use external power delivery.
 Any externally powered decoder also provides power to the bus.
 The current draw on a single connection in the bus is limited to 600mA.
 Care must be taken to ensure that no bus segment exceeds this limit.
-This can be solved either by introducing additional external power connections where required or by simply connecting decoders strategically -- \emph{e.g.} alternating high-current decoders and low current decoders.
+This can be solved either by introducing additional external power connections where required or by simply connecting decoders strategically -- \eg alternating high-current decoders and low current decoders.
 In a scenario where a single bus powered decoder is connected between 2 externally powered decoders that bus powered decoder could theoretically pull up to 1.2A assuming equal cable lengths.\footnote{The resistance of each cable depends on the cable length.
 When mismatched cable lengths are used it must be ensured that no single cable exceeds the 600mA limit.
 If e.g. one cable is 1m long and the other one 2m long, $2/3$ of the current will flow through the 1m long cable.
@@ -296,25 +298,26 @@ The display data ($data$) is treated as a single 6 bytes long unsigned integer.
 \begin{table}[ht!]
 \centering
 \begin{tabular}{ |l|l|l| } 
-\multicolumn{1}{l}{0} & \multicolumn{1}{l}{1..12} & \multicolumn{1}{l}{13} \\ \hline
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1..$} & \multicolumn{1}{l}{$13$} \\ \hline
 \texttt{D} & $HEX(data)$ & \texttt{\n} \\\hline
 \end{tabular}
 \caption{display command structure}
 \end{table}
 
-Example: \texttt{D012436fdea12\n}
+Example: \texttt{D012436fdea12\n}\\
+Regex: \texttt{D[0-9a-f]\{12\}\n}
 
 \subsection{Decoder Command}
 Decoder commands start with a \emph{type selector} ($type$) and a \emph{decoder address} ($addr$).
-After this common prefix a decoder specific payload of arbitrary length can follow.
+After this common prefix a decoder specific payload of arbitrary length ($pld$) can follow.
 The command is terminated -- as always -- with a line break.
 While theoretically arbitrary, the payload length should not exceed 12 characters.
 
 \begin{table}[h!]
 \centering
 \begin{tabular}{ |l|l|l|l| } 
-\multicolumn{1}{l}{0} & \multicolumn{1}{l}{1} & \multicolumn{1}{l}{2..n+2} & \multicolumn{1}{l}{n+3} \\ \hline
-$type$ & $HEX(addr)_0$ & $payload$ & \texttt{\n} \\\hline
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1$} & \multicolumn{1}{l}{$2..\#pld+2$} & \multicolumn{1}{l}{$\#pld+3$} \\ \hline
+$type$ & $HEX(addr)_0$ & $pld$ & \texttt{\n} \\\hline
 \end{tabular}
 \caption{decoder command structure}
 \end{table}
@@ -347,11 +350,13 @@ In addition to a specific address there is also a \emph{broadcast address} that 
 This address is the character "\texttt{+}".
 
 \subsubsection{Command Payload}
-The payload is an arbitrary character sequence with a minimum length of 1 and a maximum length of 12.
+The payload $pld$ is an arbitrary character sequence with a minimum length of 1 and a maximum length of 12.
 The payload must match the regular expression \texttt{[a-z0-9!]\{1,12\}}.
 This limitation is primarily introduced to ensure that no command payload contains uppercase letters.
 These could be incorrectly interpreted by a decoder as the start of a command line.
 The list of allowed characters may be expanded in future revisions.
+
+Regex: \texttt{[AELW][0-9+][a-z0-9!]\{1,12\}\n}
 
 \subsection{Button Event}
 The IOIB continuously monitors the states of all push buttons on the control panel.
@@ -364,7 +369,7 @@ When a new button is pressed, a \emph{key-down} event is sent, when a button is 
 \begin{table}[h!]
 \centering
 \begin{tabular}{ |l|l|l| } 
-\multicolumn{1}{l}{0..1} & \multicolumn{1}{l}{2} & \multicolumn{1}{l}{3} \\ \hline
+\multicolumn{1}{l}{$0..1$} & \multicolumn{1}{l}{$2$} & \multicolumn{1}{l}{$3$} \\ \hline
 $HEX(addr)$ & $dir$ & \texttt{\n} \\\hline
 \end{tabular}
 \caption{button event data structure}
@@ -380,7 +385,60 @@ event type     & $dir$ \\\hline\hline
 \caption{button event direction identifiers}
 \end{table}
 
-Examples: \texttt{23+\n}, \texttt{1a-\n}
+Examples: \texttt{23+\n}, \texttt{1a-\n} \\
+Regex: \texttt{[1-4][0-9a-f][+-]\n}
+
+
+\chapter{Hardware Support}
+\section{Switches}
+\textsc{Moba3} supports magnetic switch motors including \emph{Märklin} articles 74491 and 75491 and \emph{ROCO} article 10030. Older \emph{Märklin} K switches with integrated motors are also supported.
+
+\textsc{Moba3} limits the active time for all motors.
+Therefore there is no need for limit switches in any switch motors.
+They can be used but if there are issues with the driving power it is recommended to disable limit switches in the switch motors.
+
+\section{Signals}
+\textsc{Moba3} supports swiss type L home signals and distance signals with up to 4 lights.
+The lights for the main signals are labelled top-down as $G$, $R$, $O$ and $G'$.
+The lights for the distance signals are labelled clockwise starting in the top left corner as $o'$, $o''$, $g'$ and $g''$.
+The supported signal aspects are the following:\footnote{FDV R300.2 A2020 d -- sections 5.2.2 - 5.2.7}
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c|c|c| }
+\hline
+\textbf{0}/\textbf{0*} & \textbf{1}/\textbf{1*} & \textbf{2}/\textbf{2*} & \textbf{3}/\textbf{3*} \\\hline
+stop & full speed & 40km/h & 60km/h \\\hline 
+ & & & \\
+\includegraphics[width=20px]{signal/0} &
+\includegraphics[width=20px]{signal/1} &
+\includegraphics[width=20px]{signal/2} &
+\includegraphics[width=20px]{signal/3} \\
+\includegraphics[width=40px]{signal/0s} &
+\includegraphics[width=40px]{signal/1s} &
+\includegraphics[width=40px]{signal/2s} &
+\includegraphics[width=40px]{signal/3s} \\\hline
+
+$R$ & $G$ & $G,O$ & $G,G'$ \\
+$o',o''$ & $g',g''$ & $ o',g'$ & $o',g',g''$ \\\hline
+
+\end{tabular}
+\caption{supported type L signal aspects}
+\end{table}
+
+\section{Lighting}
+\textsc{Moba3} does not place any restrictions on the type of lighting that can be used:
+The light decoders provide simple digital outputs.
+These do not carry a lot of power and should not be used to power lighting elements directly.
+
+The recommended way to power external lighting is to use an NMOS transistor that switches the load to ground.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{transistor-tran21}
+    \caption{example driving circuit for lighting}
+    \label{fig:ctrb}
+\end{figure}
 
 \chapter{Circuit Boards}
 At the moment there are 4 board designs in use:
@@ -442,6 +500,18 @@ The sense pins do posses some stray capacitance.
 Due to the diode arrangement residual charges may not dissipate sufficiently quickly through leakage currents alone.
 A relatively high resistance\footnote{about $10k\Omega$ should work fine} should be used to not overload the button diodes.
 
+The figure below shows a possible wiring solution.
+The horizontal rows \texttt{1} and \texttt{2} are \emph{feed pins}.
+The vertical rows \texttt{A} and \texttt{B} are \emph{sense pins}.
+It is irrelevant on which side of the button the diode is attached as long as it retains its orientation.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.4\textwidth]{button-matrix}
+    \caption{button matrix schemtic}
+    \label{fig:ctrb}
+\end{figure}
+
 \subsubsection{Button Addressing}
 The following simple formula provides a simple way to calculate the button address from a combination of a feed pin and a sense pin:
 \[addr = 16 * (feed - 1) + sense - 1\]
@@ -450,7 +520,7 @@ Example:
 Button 4 of sector 2 would have the button id $0x13$.\footnote{pin numbers are 1-indexed}
 
 \subsection{Output Connectors}
-The remaining connectors (\texttt{J5}, \texttt{J6} and \texttt{J7}) handle \emph{output} - \emph{i.e.} the control panel LEDs.
+The remaining connectors (\texttt{J5}, \texttt{J6} and \texttt{J7}) handle \emph{output} - \ie the control panel LEDs.
 Each connector provides signals for 16 LEDs.
 These pins are directly connected to the 74HC595 shift registers.
 While low-power devices could be directly connected to these digital pins it is recommended to use these pins only to drive the gates on external NMOS transistors.
@@ -469,7 +539,7 @@ $data_0$ & $data_1$  & $data_2$  & $data_3$  & $data_4$  & $data_5$ \\\hline
 \caption{output pin assignments}
 \end{table}
 
-\pagebreak
+%\pagebreak
 \section{Decoder Boards}
 The decoder boards share much of the basic hardware.
 Specifically the power connector, the programming header and the 2 RJ45 connectors are all arranged identically on all decoders.
@@ -482,7 +552,7 @@ Also the microprocessor and all basic support components share common placement 
 \end{figure}
 
 On the decoder boards the 2 RJ45 connectors are used for daisy chaining the \emph{remote} bus.
-The connector \texttt{J4} is used as the \emph{input} -- \emph{i.e.} the connection to the CTRB or a \emph{previous} board.
+The connector \texttt{J4} is used as the \emph{input} -- \ie the connection to the CTRB or a \emph{previous} board.
 The second connector -- \texttt{J5} -- is the \emph{output}.
 This connector is used to connect to the \emph{next} board in the chain.
 At the last board in the chain this connector can simply be left disconnected and no bus termination is required.
@@ -498,7 +568,7 @@ Please note that the mounting holes are plated and the plating is connected to t
 To ensure balanced currents on the bus power wires it is recommended to ensure that the mounting screws -- and thereby the mounting holes -- remain electrically isolated from any external ground connection on boards that are bus powered.
 On externally powered boards this isolation is not required.
 
-\pagebreak
+%\pagebreak
 \subsection{General Purpose Decoder}
 \begin{figure}[h!]
     \centering
@@ -520,12 +590,12 @@ the shift register \texttt{U10} can remain unpopulated.
 When using the output pins to directly power external components it must be ensured that each pin does not exceed the maximum pin current and each connector does not exceed the maximum port current for the specific shift register used.
 Power usage should probably be kept below $10mA$ per pin.
 
-In some situation the output pins may be used as open collectors to power low power devices (\emph{e.g.} LEDs).
+In some situation the output pins may be used as open collectors to power low power devices (\eg LEDs).
 These do require a power supply.
 If the board is bus-powered the power supply to the external devices should also be taken from the board to keep the currents through the power cables on the bus balanced.
 The power may either be taken from the \texttt{POWER1} connector or from the auxiliary pin \texttt{J6} which is also connected to the 5V rail of the board.
 
-\pagebreak
+%\pagebreak
 \subsection{Switch Decoder}
 \begin{figure}[h!]
     \centering
@@ -551,20 +621,331 @@ Failure to connect the 24V rail could lead to destructive failure of the NMOS tr
 For this reason it is recommended to verify a stable connection upon installation.
 A voltage measurement between the cathode of any flyback diode and an exposed mounting hole plating can be used for this purpose.
 
-If a decoder does not control 6 switches, the components for any unused connections can remain unpopulated.
-A single switch is driven by one dual-channel MOSFET driver with one pull-down resistor per channel and two NMOS transistors with a flyback diode each.
+\chapter{Decoder Type Specifications}
+Each decoder type has its own behaviour and command structure.
+The decoder command structures in essence define an \emph{instruction set} of instructions sent from the CTRB to the decoders to control the model railway.
+The following sections provide detailed specifications for all currently supported decoder types and their individual commands.
 
-\chapter{Decoder Command Specification}
-Each decoder type has its own command structure.
-These decoder command structures in essence define an \emph{instruction set} of instructions sent from the CTRB to the decoders to control the model railway.
-The following sections provide detailed specifications for all currently supported commands.
+\section{Switch Decoder}
+Each switch decoder controls up to 6 switches at once.
+The switches have a limited drive time (2000ms) after which the switch motor is disabled.
+The switching time limits are handled for each switch individually.
+While the relatively long switching time should allow switches to fully transition during a switching action.
 
-\section{Switch Commands}
+It is possible that simultaneous switching actions drop the supply voltage.
+To avoid this issue it is recommended to send switch commands sequentially over some time.
+That way each switch can profit from the full power of the power supply capacitors and between the switching actions the power supply can recover.
 
-\section{Exit Signal Commands}
+\subsection{Pinout}
+\begin{table}[ht!]
+\centering
+\begin{tabular} { |c|c|c|c|c|c||c|c|c|c|c|c| }
+
+\hline
+\multicolumn{6}{ |c|| }{\texttt{J1}} &
+\multicolumn{6}{ |c|  }{\texttt{J3}} \\\hline
+
+1 & 2 & 3 & 4 & 5 & 6 &
+1 & 2 & 3 & 4 & 5 & 6 \\\hline\hline
+
+a & b &
+a & b &
+a & b &
+a & b &
+a & b &
+a & b \\\hline
+
+\multicolumn{2}{ |c|  }{Sw 1} &
+\multicolumn{2}{ |c|  }{Sw 2} &
+\multicolumn{2}{ |c|| }{Sw 3} &
+\multicolumn{2}{ |c|  }{Sw 4} &
+\multicolumn{2}{ |c|  }{Sw 5} &
+\multicolumn{2}{ |c|  }{Sw 6} \\\hline
+
+
+\end{tabular}
+\caption{switch decoder pinout}
+\end{table}
+
+
+\subsection{Command Structure}
+The switch decoders can receive commands for any number of switches at once.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c|c||c| } 
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1$} & \multicolumn{1}{l}{$2i$} & \multicolumn{1}{l}{$2i+1$} & \multicolumn{1}{c}{2n+2} \\ \hline
+\texttt{W} & $addr$ & $sid_i$ & $cmd_i$ & \texttt{\n} \\\hline
+\end{tabular}
+\caption{switch command structure}
+\end{table}
+
+Each $(sid_i,cmd_i)$ pair is treated as a single command for one switch.
+$sid_i$ is the switch id (\texttt{1}-\texttt{6}) for which $cmd_i$ should be executed.
+It is not allowed to send two commands for one switch within a single packet.
+If multiple commands are sent for a single switch the decoder behaviour is not defined.
+Currently there are 3 supported commands:
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |l|l| }
+\hline
+$cmd_i$ & command \\\hline\hline
+\texttt{a} & move switch to \emph{straight} track \\\hline
+\texttt{b} & move switch to \emph{diverging} track \\\hline
+\texttt{!} & reapply previous command \\\hline
+\end{tabular}
+\caption{supported switch commands}
+\end{table}
+
+Switches are moved by the commands \texttt{a} and \texttt{b}.
+Generally a decoder will drive a switch motor if it believes a switch to already be in the desired position
+-- \ie repeated commands are ignored.
+There are however situations where a switch is in a different position than the decoder has driven it to:
+A switch could have been moved manually or the switch power supply may have been unpowered when the decoder last drove the switch motor.
+For these situations the command \texttt{!} was introduced. It repeates the previous command for the switch.
+
+Example: \texttt{W21a2b3!4a5b6!\n} \\
+Regex: \texttt{W[1-9+]([1-6][ab!])\{1,6\}\n}
+
+\section{Exit Signal Decoder}
+Each exit signal decoder can control up to 4 exit signals with up to 4 signal LEDs each.
+While full 4-LED signals are supported signals with reduced capabilities can also be connected and the pins for unsupported LEDs can simply remain disconnected.
+Such a "degraded" signal would simply be incapable of showing some aspects -- \eg a 3-LED signal without $G'$ would be incapable of displaying aspect \textbf{3} and would simply show aspect \textbf{1} instead.
+A signal with only 2 LEDs -- $G$ and $R$ -- would only be able to show aspects \textbf{0} and \textbf{1}.
+Any other aspects would be displayed as aspect \textbf{1}.
+
+The power-on idle state for all signals is aspect \textbf{0}.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular} { |c||c|c|c|c| }
+\hline
+& \multicolumn{4}{|c|}{signal aspect} \\\hline
+signal type & \textbf{0} & \textbf{1} & \textbf{2} & \textbf{3} \\\hline\hline
+2 LEDs & $X$ & $X$ &     &     \\\hline
+3 LEDs & $X$ & $X$ & $X$ &     \\\hline
+4 LEDs & $X$ & $X$ & $X$ & $X$ \\\hline
+\end{tabular}
+\caption{aspects supported by different signals}
+\end{table}
+
+\subsection{Pinout}
+The decoder drives the signal LEDs directly similarily to an open-collector setup.
+The LEDs need to be powered with 5V -- just like the decoder itself.
+The pins are not using tristate control.
+The pins for LEDs that should be disabled are pulled high and pins for active LEDs are pulled to ground.
+
+The pins are mapped as follows:
+
+\begin{table}[ht!]
+\centering
+\begin{tabular} { |c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c| }
+\hline
+\multicolumn{8}{ |c|| }{\texttt{J1}} &
+\multicolumn{8}{ |c|  }{\texttt{J3}} \\\hline
+
+1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 &
+1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\\hline\hline
+
+$G'_1$ & $O_1$ & $R_1$ & $G_1$ &
+$G'_2$ & $O_2$ & $R_2$ & $G_2$ & 
+$G'_3$ & $O_3$ & $R_3$ & $G_3$ &
+$G'_4$ & $O_4$ & $R_4$ & $G_4$ \\\hline
+
+\multicolumn{4}{ |c|  }{Signal 1} &
+\multicolumn{4}{ |c|| }{Signal 2} &
+\multicolumn{4}{ |c|  }{Signal 3} &
+\multicolumn{4}{ |c|  }{Signal 4} \\\hline
+\end{tabular}
+\caption{exit signal decoder pinout}
+\end{table}
+
+\subsection{Command Structure}
+Similar to switch commands the exit signal commands can carry up to 4 individual signal commands.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c|c||c| } 
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1$} & \multicolumn{1}{l}{$2i$} & \multicolumn{1}{l}{$2i+1$} & \multicolumn{1}{c}{$2n+2$} \\ \hline
+\texttt{A} & $addr$ & $sid_i$ & $cmd_i$ & \texttt{\n} \\\hline
+\end{tabular}
+\caption{exit signal command structure}
+\end{table}
+
+Each $(sid_i,cmd_i)$ pair is treated as a single command for one exit signal.
+$sid_i$ is the signal id.
+For this id the signals 1-4 are labelled as \texttt{a}-\texttt{d}.
+The command $cmd_i$ sets the signal aspect for the signal.
+These are transmitted as their aspect number.
+It is illegal to send multiple commands targeting a single signal.
+In this case the behaviour is undefined.
+
+Example: \texttt{A1a0b1c2c3\n} \\
+Regex: \texttt{A[1-9+]([a-d][0-3])\{1,4\}\n}
 
 \section{Entry Signal Commands}
+The entry signal decoders support up to 2 entry signals.
+Entry signals are combined home and distance signals.
+The home signal displays the signal aspect for the entry while the distance signal announces the aspect of the exit signal at the end of the station track the train is directed to.
+The distance signals always require all 4 LEDs but the home signals can use less if the unsupported aspects are not needed.
 
-\section{Lighting Commands}
+The power-on idle state for all home signals is aspect \textbf{0} while the distance signals are disabled.
+The distance signals are always disabled while the corresponding home signal displays aspect \textbf{0}.
+
+\subsection{Pinout}
+The decoder drives the LEDs directly.
+Just like with the exit signals the signals need to be powered with 5V.
+
+The pins are mapped as follows:
+
+\begin{table}[ht!]
+\centering
+\begin{tabular} { |c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c| }
+\hline
+\multicolumn{8}{ |c|| }{\texttt{J1}} &
+\multicolumn{8}{ |c|  }{\texttt{J3}} \\\hline
+
+1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 &
+1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\\hline\hline
+$g''_1$ & $g'_1$ & $o''_1$ & $o'_1$ &
+$G'_1$ & $O_1$ & $R_1$ & $G_1$ & 
+$g''_2$ & $g'_2$ & $o''_2$ & $o'_2$ &
+$G'_2$ & $O_2$ & $R_2$ & $G_2$ \\\hline
+
+\multicolumn{4}{ |c|  }{distance signal} &
+\multicolumn{4}{ |c|| }{home signal} &
+\multicolumn{4}{ |c|  }{distance signal} & 
+\multicolumn{4}{ |c|  }{home signal} \\\hline
+
+\multicolumn{8}{ |c||  }{Signal 1} &
+\multicolumn{8}{ |c|  }{Signal 2} \\\hline
+\end{tabular}
+\caption{entry signal decoder pinout}
+\end{table}
+
+\subsection{Command Structure}
+Each command can carry up to 2 individual commands for the different signals.
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c|c|c||c| } 
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1$} & \multicolumn{1}{l}{$3i-1$} & \multicolumn{1}{l}{3i} & \multicolumn{1}{c}{3i+1} & \multicolumn{1}{l}{3n+2} \\\hline
+\texttt{E} & $addr$ & $sid_i$ & $home_i$ & $dist_i$ & \texttt{\n} \\\hline
+\end{tabular}
+\caption{entry signal command structure}
+\end{table}
+
+Each 3 character sequence $(sid_i, home_i, dist_i)$ encodes the command for one signal.
+The signal id $sid_i$ is either \texttt{a} or \texttt{b}.
+This identifies signals 1 and 2 respectively.
+Both $home_i$ and $dist_i$ encode a signal aspect.
+The home signal aspect is encoded by $home_i$ while the distance signal is encoded by $dist_i$.
+When $home_i$ is \texttt{0} the value of $dist_i$ is ignored.
+This information is irrelevant since the distance signal is turned off whenever the home signal shows aspect \textbf{0}.
+
+The distance signal aspects are transmitted as their corresponding home signal aspects.
+The aspect \textbf{2*} -- for example -- would be transmitted as \texttt{2}.
+
+It is illegal to send two commands targeting a single signal.
+In this case the behaviour is undefined.
+
+Example: \texttt{E1a10b32\n} \\
+Regex: \texttt{E[1-9+]((a|b)[0-3]\{2\})\{1,2\}\n}
+
+\section{Light Decoder}
+Besides controlling railway related components (switches and signals) \textsc{Moba3} also provides lighting control through light decoders.
+Each light decoder provides control for 16 individually controlled digital output pins.
+These are directly controlled by commands.
+It is possible to update the entire decoder at once.
+The outputs can also be adjusted through bit-level manipulation fo the output pins.
+To support these different interaction possiblities the light decoder provides not one but 5 different commands.
+
+The different commands are provided both for normal use and for testing purposes.
+It is possible to fully control lighting by only using basic \texttt{u}-based update commands.
+
+\subsection{u - Update Ouput}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c|c||c| } 
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1$} & \multicolumn{1}{l}{$2$} & \multicolumn{1}{l}{$3..6$} & \multicolumn{1}{l}{$7$} \\ \hline
+\texttt{L} & $addr$ & \texttt{u} & $hex(data)$ & \texttt{\n} \\\hline
+\end{tabular}
+\caption{light decoder command \texttt{u}}
+\end{table}
+
+This command receives a 2-byte number encoding the data for all 16 output pins.
+The data is encoded in a simple bit map:
+Bit 0 encodes pin 1, bit 1 encodes pin 2, \emph{etc.}
+
+Example: \texttt{L2u0a1f\n} \\
+Regex: \texttt{L[1-9+]u[0-9a-f]\{4\}\n}
+
+\subsection{c - Clear with Mask}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c|c||c| } 
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1$} & \multicolumn{1}{l}{$2$} & \multicolumn{1}{l}{$3..6$} & \multicolumn{1}{l}{$7$} \\ \hline
+\texttt{L} & $addr$ & \texttt{c} & $hex(data)$ & \texttt{\n} \\\hline
+\end{tabular}
+\caption{light decoder command \texttt{c}}
+\end{table}
+
+This command receives a 2-byte number encoding a 16-bit mask.
+This mask is applied to the output pins each pin for which the corresponding bit in the flag is set is disabled. The command \texttt{c0902} for example would clear pins 1, 4 and 10 of the decoder.
+
+Example: \texttt{L2c0a1f\n} \\
+Regex: \texttt{L[1-9+]c[0-9a-f]\{4\}\n}
+
+\pagebreak
+\subsection{s - Set with Mask}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c|c||c| } 
+\multicolumn{1}{l}{$0$} & \multicolumn{1}{l}{$1$} & \multicolumn{1}{l}{$2$} & \multicolumn{1}{l}{$3..6$} & \multicolumn{1}{l}{$7$} \\ \hline
+\texttt{L} & $addr$ & \texttt{s} & $hex(data)$ & \texttt{\n} \\\hline
+\end{tabular}
+\caption{light decoder command \texttt{s}}
+\end{table}
+
+This command receives a 2-byte number encoding a 16-bit mask.
+This mask is applied to the output pins each pin for which the corresponding bit in the flag is set is enabled. The command \texttt{s0902} for example would set pins 1, 4 and 10 of the decoder.
+
+Example: \texttt{L2s0a1f\n} \\
+Regex: \texttt{L[1-9+]s[0-9a-f]\{4\}\n}
+
+\subsection{r - Disable Output}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c||c| } 
+\multicolumn{1}{l}{0} & \multicolumn{1}{l}{1} & \multicolumn{1}{l}{2} & \multicolumn{1}{l}{3} \\ \hline
+\texttt{L} & $addr$ & \texttt{r} & \texttt{\n} \\\hline
+\end{tabular}
+\caption{light decoder command \texttt{r}}
+\end{table}
+
+The simples command is the single-character command \texttt{r}.
+This command clears all output pins.
+This command is equivalent to the longer \texttt{L?u0000\n}.
+
+Example: \texttt{L2r\n}\\
+Regex: \texttt{L[1-9+]r\n}
+
+\subsection{o - Enable Output}
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c||c||c| } 
+\multicolumn{1}{l}{0} & \multicolumn{1}{l}{1} & \multicolumn{1}{l}{2} & \multicolumn{1}{l}{3} \\ \hline
+\texttt{L} & $addr$ & \texttt{o} & \texttt{\n} \\\hline
+\end{tabular}
+\caption{light decoder command \texttt{r}}
+\end{table}
+
+The second trivial command is the single-character command \texttt{o}.
+This command clears all output pins.
+This command is equivalent to the longer \texttt{L?offff\n}.
+
+Example: \texttt{L2o\n}\\
+Regex: \texttt{L[1-9+]o\n}
 
 \end{document}
