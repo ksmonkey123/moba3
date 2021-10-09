@@ -5,7 +5,7 @@
 
 namespace Util {
 
-    unsigned long decodeHexString(char* string, char length);
+    uint16_t decodeHexString16(char* string);
 
 }
 

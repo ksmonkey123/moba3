@@ -15,8 +15,12 @@
 \graphicspath{ {./images} }
 
 \title{MOBA3 Control System}
-\subtitle{Model Railway Control System\\System Design Specification and Documentation\\Revision A}
+\subtitle{
+Model Railway Control System\\
+System Design Specification and Documentation\\\ \\
+Rev. A}
 \author{Andreas Wälchli}
+\date{\today}
 
 \hyphenation{trans-ceiver}
 \hyphenation{trans-ceivers}
@@ -47,9 +51,10 @@ Details about software internals and precise decoder operation are deliberately 
 
 \section{Historical Context}
 During the construction of the current model railway the decision was made to use traditional analog control for the trains.
-Many models were not yet equipped with digital decoders and a retrofit would have been exceedingly expensive.
-Since no industry standard digital solution was used for the train control, the decision was made to design and construct a custom digital control solution for all other components of the railway.
-This solution would provide push button based control from a schematic control board to control all switches, signals and all lighting.
+Many models were not yet equipped with digital decoders and a retrofit would have been prohibitively expensive.
+Since no industry standard digital solution was used for the train control the decision was made to design and construct a custom digital control solution for all other components of the railway.
+This solution would provide a push button based control interface designed as a schematic control board.
+This would control all switches, signals and all lighting.
 
 \subsection{MOBA1}
 A first design used custom control and decoder boards based on the PIC16F527 microcontroller.
@@ -57,14 +62,15 @@ The entire railway was divided into 5 sectors:
 
 \emph{Shadow station}, \emph{left entry to main station}, \emph{right entry to main station}, \emph{track switches} and \emph{lighting}.
 
-Each sector had a \emph{master} board embedded in the control board that controlled up to 16 push buttons, 16 LEDs on the control board and continuously transmitted a single 8-bit data packet to the decoders in the railway.
+Each sector had a \emph{master} board embedded in the control board.
+This controlled up to 16 push buttons, 16 LEDs on the control board and continuously transmitted a single 8-bit data packet to the decoders in the railway.
 This packet did not encode commands but rather a fixed \emph{desired state}.
 Each decoder would receive the current state data and check what modifications to its own outputs had to be done to conform to that state.
 As a consequence each decoder required bespoke decoding logic.
 The data also had to be encoded very efficiently to fit the fixed-length packet.
 The sector \emph{right entry to main station} for example controlled 6 switches, 2 entry signals, 4 exit signals and could drive up to 2 independent paths at once.
 
-Each packet contained a single \emph{even parity bit} was packed between start and end marker bits:
+Each packet contained a single \emph{even parity bit} and was packed between start and end marker bits:
 
 \begin{table}[ht!]
 \centering
@@ -76,7 +82,7 @@ $START$ & $data_{0..7}$ & $parity_0(data)$ & $END$ \\\hline
 \end{table}
 
 
-Transmission was done over a custom unshielded single-ended single-wire data bus with a relatively low baudrate and every bit of data was transmitted over 3 bus clock cycles.
+Transmission was done over a custom unshielded single-ended single-wire serial data bus with a relatively low baudrate. Every bit of data was transmitted over 3 bus clock cycles.
 
 \begin{table}[ht!]
 \centering
@@ -92,7 +98,7 @@ $END$   & \texttt{111} \\\hline
 \end{table}
 
 \subsection{MOBA2}
-During construction and testing of the first system it became clear that this was highly limited:
+During the construction and testing of the first system it became clear that this solution was highly limited:
 Each sector had its own \emph{master} board and these were not able to exchange any data.
 Additionally programs for the PIC16F527 microcontroller needed to be written in MIPS Assembly, which made high-level software design difficult.
 
@@ -100,21 +106,23 @@ It was therefore decided to move the high-level control logic onto a RaspberryPi
 This allowed for programming of the control logic in high-level languages (Java was used).
 
 The \emph{master} boards for each sector now no longer managed the entire control logic.
-It simply transmitted the button states to the RPi and received both the states of the control board LEDs and the sector status packet from the RPi.
+They simply transmitted the button states to the RPi and received both the states of the control board LEDs and the sector status packet from the RPi.
 Communication between the RPi and the \emph{master} boards was done using SPI in mode $(0,0)$.
-
 The decoders in the railway and the previously described transmission scheme remained in place.
-Over time this system showed its weaknesses:
+
+Over time this system also showed its weaknesses:
 A model railway is inherently a high-EMI environment.
 Relay-based switch drivers and brushed motors, for example, produce significant interference.
 But the transmission scheme was not designed with EMI resistance in mind:
 An unshielded single-ended serial bus is obviously not suited for such environments.
 As a consequence we observed many transmission errors.
-To solve this, very extensive error detection was required which slowed the data busses down significantly.
-Additional problems manifested themselves as soon as microcontrollers from another batch were introduced:
-The microcontrollers all used internal 4MHz RC oscillators.
+To solve this we needed to introduce very extensive error detection.
+This slowed the data busses down significantly.
+Additional problems manifested themselves as soon as microcontrollers from another production batch were introduced:
+The microcontrollers all used internal 4MHz RC oscillators but these had significant variance between batches.
 But the bus required relatively tight timings to avoid reception errors.
 This could be partially solved by calibrating each decoder controller to the frequency of its \emph{master} board.
+But the oscillators would also drift based on the atmospheric climate.
 In the end we were forced to introduce a self-calibration routine that would calibrate each microcontroller based on the incoming serial data signal.
 This routine would run at every startup and whenever the decoder had too many transmission errors.
 The issues of transmission errors could however never be completely solved.
@@ -130,9 +138,9 @@ The full redesign of the control system allowed for the definition of clear desi
 
 \subsubsection{Stability and Standardisation}
 The first iterations used a lot of custom concepts and hardware solutions.
-For the redesign we specifically chose to replace many of the custom design elements with industry standard solutions where applicable.
+For the redesign many of these custom design elements should be replaced with industry standard solutions where applicable.
 Where industry solutions are not directly transferrable, they should at least be adapted to our needs.
-The design would also account for the interference issues observed with previous iteration wherever possible.
+The design should also try account for the interference issues observed with previous iteration wherever possible.
 
 \subsubsection{Improved Commonality}
 The entire system shall use common hardware design as far as feasible:
@@ -172,7 +180,7 @@ Additional components can be introduced on specific boards if needed.
 
 \subsection{Microcontroller}
 Each board uses a single central microcontroller.
-The model used is an ATmega328p.
+The model used is an ATmega328P.
 This is the exact same microcontroller as is used on \emph{Arduino Uno} and \emph{Arduino Nano} boards.
 This allows for easy prototyping and debugging using that board.
 The microcontroller is provided with an external clock signal from a 16Mhz crystal oscillator.
@@ -183,13 +191,14 @@ This commonality in configuration between Arduino boards and our \textsc{Moba3} 
 The data busses (specified below) require RS422/RS485 transceiver chips.
 All transceivers should be from the MAX481 transceiver family or compatible hardware.
 The MAX481 family consists of multiple different transceivers in different configurations (simplex, half-duplex, full-duplex, etc.).
-Any component of this family can be used and for each board the best suited one can be selected.
+Any component of this family can be used.
+For each board the best suited model can be selected.
 
 \subsection{Multi-Pin Input and Output}
 For multi-pin I/O the individual pins should not be connected directly to the microcontroller.
 PISO and POSI circuits should be used instead.
 Standard ICs used for Arduino-based applications are the CD4021 and 74HC595 ICs for input and output respectively.
-These are buffered shift registers that can be daisy chained.
+These are buffered shift registers that can easily be daisy chained.
 
 The CD4021 is an 8-bit shift register with \emph{parallel load} functionality.
 This makes it useful for \emph{parallel-to-serial} data input.
@@ -209,16 +218,11 @@ The \emph{local bus} and the \emph{remote bus}.
 To improve EMI resistance shielded CAT6a cabling\footnote{S/FTP with a grounded shield} is used.
 Low power decoders can be powered directly by the bus, higher power decoders do require external power delivery.
 Some decoders may require additional voltages.
-These should \emph{always} use external power delivery.
+These should always use external power delivery.
 Any externally powered decoder also provides power to the bus.
 The current draw on a single connection in the bus is limited to 600mA.
 Care must be taken to ensure that no bus segment exceeds this limit.
 This can be solved either by introducing additional external power connections where required or by simply connecting decoders strategically -- \eg alternating high-current decoders and low current decoders.
-In a scenario where a single bus powered decoder is connected between 2 externally powered decoders that bus powered decoder could theoretically pull up to 1.2A assuming equal cable lengths.\footnote{The resistance of each cable depends on the cable length.
-When mismatched cable lengths are used it must be ensured that no single cable exceeds the 600mA limit.
-If e.g. one cable is 1m long and the other one 2m long, $2/3$ of the current will flow through the 1m long cable.
-In that scenario the entire structure would be limited to 900mA.
-In general if the cable lengths differ by a factor $n$, the current limit would be $(n+1)/n * 600mA$.}
 
 \subsubsection {Bus Loading and Biasing}
 In a deviation from the RS422 specification the bus does not need to be terminated. Each decoder loads the differential pair with a $10k\Omega$ resistor. This loading introduces a theoretical limit on the number of supported decoders to around 150. But this is very obviously only a theoretical limit and does not need to be considered further. In case the system should be used for an application with more than around 100 decoders we suggest the introduction active repeaters.
@@ -226,7 +230,7 @@ In a deviation from the RS422 specification the bus does not need to be terminat
 The differential pair is also not biased. The loading resistor equalises the voltage potential in the differential pair on disconnected decoders. The MAX481 transceiver will always read equal voltages as a logical $0$. The transmitters are always powered. For situations where the busses are correctly connected biasing becomes irrelevant as the transmitters will always drive the differential pair.
 
 \subsection{Local Bus Specification}
-The \emph{local bus} is a full-duplex bus used for communication between the central CTRB and the IOIB that manages I/O on the control panel. 2 differential pairs are used for bidirectional data transmission, the remaining 2 are used for power.
+The \emph{local bus} is a full-duplex bus used for communication between the CTRB and the IOIB that manages I/O on the control panel. 2 differential pairs are used for bidirectional data transmission, the remaining 2 are used for power.
 
 \begin{table}[ht!]
 \centering
@@ -399,7 +403,7 @@ They can be used but if there are issues with the driving power it is recommende
 
 \section{Signals}
 \textsc{Moba3} supports swiss type L home signals and distance signals with up to 4 lights.
-The lights for the main signals are labelled top-down as $G$, $R$, $O$ and $G'$.
+The lights for the home signals are labelled top-down as $G$, $R$, $O$ and $G'$.
 The lights for the distance signals are labelled clockwise starting in the top left corner as $o'$, $o''$, $g'$ and $g''$.
 The supported signal aspects are the following:\footnote{FDV R300.2 A2020 d -- sections 5.2.2 - 5.2.7}
 

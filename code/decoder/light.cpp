@@ -7,6 +7,10 @@ void Light::init() {
   Output::init(0, nullptr);
 }
 
+static boolean validate(char length) {
+  return length == 5;
+}
+
 void Light::process(char* buffer, char length) {
   switch(buffer[0]) {
     case 'r':
@@ -16,13 +20,19 @@ void Light::process(char* buffer, char length) {
       Output::setState(-1);
       break;
     case 's':
-      Output::setMask(Util::decodeHexString(buffer + 1, length - 1));
+      if (validate(length)) {
+        Output::setMask(Util::decodeHexString16(buffer + 1));
+      }
       break;
     case 'c':
-      Output::clearMask(Util::decodeHexString(buffer + 1, length - 1));
+      if (validate(length)) {
+        Output::clearMask(Util::decodeHexString16(buffer + 1));
+      }
       break;
     case 'u':
-      Output::setState(Util::decodeHexString(buffer + 1, length - 1));
+      if (validate(length)) {
+        Output::setState(Util::decodeHexString16(buffer + 1));
+      }
       break;
     default:
       break;
