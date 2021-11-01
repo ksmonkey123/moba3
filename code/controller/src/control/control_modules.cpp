@@ -1,10 +1,16 @@
 #include "control_modules.h"
+#include "../timer.h"
+
+static void process(Timer* timer) {
+    Yard::tick();
+    Tracks::tick();
+    Station::Left::tick();
+    Station::Right::tick();
+    Darkmode::tick();
+    ForcedUpd::tick();
+    Light::tick();
+}
 
 void initControllers() {
-    Yard::init();
-    Tracks::init();
-    Station::Left::init();
-    Station::Right::init();
-    Darkmode::init();
-    ForcedUpd::init();
+    Timer::create(process)->start();
 }

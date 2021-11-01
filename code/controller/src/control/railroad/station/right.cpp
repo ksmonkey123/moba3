@@ -1,9 +1,6 @@
 #include "../../control_modules.h"
 #include "station.h"
 
-static void tick(Timer*);
-static void upgrade(Timer*);
-
 SignalLevel exitSignalsRight[4];
 
 struct Path {
@@ -14,18 +11,11 @@ struct Path {
 static Path innerPath = { .target = -1, .direction = SignalDirection::DISABLED };
 static Path outerPath = { .target = -1, .direction = SignalDirection::DISABLED };
 
-static Timer* upgradeTimer;
-
 static struct {
     SignalDirection signalDirection;
     byte track;
     byte entry;
 } data;
-
-void Station::Right::init() {
-    Timer::create(tick)->start();
-    upgradeTimer = Timer::create(SIGNAL_UPGRADE_DELAY, upgrade);
-}
 
 static boolean isCrossed = false;
 
@@ -203,7 +193,16 @@ static void processDisplayAndSignals() {
     processSignals();
 }
 
-static void tick(Timer*) {
+static void upgrade() {
+    if (data.entry == 0) {
+        innerPath.direction = data.signalDirection;
+    } else {
+        outerPath.direction = data.signalDirection;
+    }
+    processDisplayAndSignals();
+}
+
+void Station::Right::tick() {
     // handle reset
     boolean reset = false;
     if (Buttons::read(BUTTON_STATION_CLEAR_R_1)) {
@@ -215,7 +214,7 @@ static void tick(Timer*) {
         reset = true;
     }
     if (reset) {
-        upgradeTimer->stop();
+        async_abort(upgrade);
         return;
     }
 
@@ -270,21 +269,11 @@ static void tick(Timer*) {
         }
 
         processDisplayAndSignals();
-        upgradeTimer->start();
+        async(upgrade, SIGNAL_UPGRADE_DELAY);
     } else {
         data.track = -1;
         data.entry = -1;
-        upgradeTimer->stop();
+        async_abort(upgrade);
     }
 
-}
-
-static void upgrade(Timer* timer) {
-    timer->stop();
-    if (data.entry == 0) {
-        innerPath.direction = data.signalDirection;
-    } else {
-        outerPath.direction = data.signalDirection;
-    }
-    processDisplayAndSignals();
 }

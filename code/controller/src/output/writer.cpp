@@ -5,6 +5,7 @@
 #include "entrySignals.h"
 #include "exitSignals.h"
 #include "display.h"
+#include "lights.h"
 
 #include "../timer.h"
 #include "../settings.h"
@@ -27,12 +28,14 @@ static CommandProvider commandProviders[] = {
     EntrySignals::getNextCommand,
     ExitSignals::getNextCommand,
     Display::getNextCommand,
+    Lights::getNextCommand,
     // continous retransmission
     #if RETRANSMIT
     Switches::getRepetitionCommand,
     EntrySignals::getRepetitionCommand,
     ExitSignals::getRepetitionCommand,
     Display::getRepetitionCommand,
+    Lights::getRepetitionCommand,
     #endif
 };
 

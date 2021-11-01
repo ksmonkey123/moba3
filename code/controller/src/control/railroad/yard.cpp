@@ -1,15 +1,9 @@
 #include "../control_modules.h"
 
-static void process(Timer*);
-
 enum Entry { NONE, LEFT, RIGHT};
 
 static byte currentTrack = -1;
 static Entry currentEntry = NONE;
-
-void Yard::init() {
-    Timer::create(process)->start();
-}
 
 static void doReset() {
     Switches::setSwitch(SWITCH_YARD_01, Switches::UNKNOWN);
@@ -97,7 +91,7 @@ static boolean calculateSwitches(byte entry, byte track) {
     return true;
 }
 
-static void process(Timer*) {
+void Yard::tick() {
     if (Buttons::read(BUTTON_YARD_CL)) {
         doReset();
         return;

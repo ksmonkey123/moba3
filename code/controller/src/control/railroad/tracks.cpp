@@ -1,12 +1,6 @@
 #include "../control_modules.h"
 
-static void process(Timer*);
-
-void Tracks::init() {
-    Timer::create(process)->start();
-}
-
-static void process(Timer*) {
+void Tracks::tick() {
     if (Buttons::read(BUTTON_TRACK_C)) {
         Switches::setSwitch(SWITCH_TRACK_1, Switches::UNKNOWN);
         Switches::setSwitch(SWITCH_TRACK_2, Switches::UNKNOWN);

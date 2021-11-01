@@ -1,13 +1,7 @@
 #include "control_modules.h"
 #include "../output/display.h"
 
-static void process(Timer*);
-
-void Darkmode::init() {
-    Timer::create(process)->start();
-}
-
-static void process(Timer*) {
+void Darkmode::tick() {
     static boolean fired = false;
     boolean button = Buttons::read(BUTTON_DARKMODE);
 

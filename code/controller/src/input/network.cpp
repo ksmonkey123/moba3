@@ -7,6 +7,15 @@ static char buffer_length;
 
 void Network::init() {
     Serial.begin(NETWORK_BAUDRATE);
+    Serial.println();
+    Serial.println("----------------------");
+    Serial.println("starting controller...");
+    Serial.println("build date:");
+    Serial.print  (__DATE__);
+    Serial.print  (" - ");
+    Serial.println(__TIME__);
+    Serial.println("----------------------");
+    delay(1000);
 }
 
 void processCharacter(char c) {
