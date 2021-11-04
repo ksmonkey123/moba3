@@ -36,7 +36,11 @@ void EntrySignals::setSignal(byte id, SignalLevel primary, SignalLevel secondary
 
     if (sig->primary != primary || sig->secondary != secondary) {
         sig->primary = primary;
-        sig->secondary = secondary;
+        if (sig->primary == HALT) {
+            sig->secondary = HALT;
+        } else {
+            sig->secondary = secondary;
+        }
         sig->dirty = true;
         dec->dirty = true;
         StatusLED::blink;

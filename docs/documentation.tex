@@ -18,7 +18,7 @@
 \subtitle{
 Model Railway Control System\\
 System Design Specification and Documentation\\\ \\
-Rev. A}
+Rev. B}
 \author{Andreas Wälchli}
 \date{\today}
 
@@ -28,7 +28,7 @@ Rev. A}
 \newcommand\n{\char`\\n}
 \newcommand\ie{\emph{i.e. }}
 \newcommand\eg{\emph{e.g. }}
-
+\newcommand{\code}[1]{\texttt{#1}}
 
 
 \begin{document}
@@ -951,5 +951,170 @@ This command is equivalent to the longer \texttt{L?offff\n}.
 
 Example: \texttt{L2o\n}\\
 Regex: \texttt{L[1-9+]o\n}
+
+\chapter{Controller Code Documentation}
+\section{Asynchronous Processing}
+The controller supports asynchronous processing using the \code{async} method.
+This method accepts a function pointer of the type \code{void(*)()} and a timeout parameter.
+The timeout parameter defines the time in milliseconds before the provided function should be passed.
+The delay is not precise but guaranteed to be no shorter than the provided time.
+If an already scheduled execution needs to be cancelled this can be done through an invocation of the method \code{async\_abort}.
+This function requires a function pointer and cancels all scheduled executions of the provided function.
+
+The \code{async} API supports a limited number of concurrently scheduled asynchronous calls.
+The limit is configurable but impacts static memory usage.\footnote{Each slot requires 6 bytes of memory. There also is a constant overhead of 4 bytes.}
+Currently this limit is set to 16.\footnote{This yields a static memory usage of 100 bytes.}
+If at the time of an \code{async} invocation the limit is already reached the new execution cannot be scheduled.
+The call is then ignored and returns \code{false} to indicate the failed scheduling.
+
+All asynchronous invocations are \emph{single-shot} -- \ie each scheduled execution is performed exactly once.
+The schedule for a triggered invocation is removed immediately before the invocation.
+If a repeated invocation is desired the function can register itself again.
+The way in which the schedule is managed guarantees that during one invocation of a triggered function there is always at least one schedule slot available.
+
+\section{Timed Processing}
+In addition to the asynchronous processing there also exists a second asynchronous API: \code{timer}.
+This API is more heavy-weight:
+Timers are static objects that are never discarded.
+They also require more memory than entries in the \code{async} schedule.\footnote{Each timer requires 11 bytes.}
+Timers are designed for perpetually running logic that needs to be performed in approximately regular time intervals -- \eg writing commands to the data bus.
+Timers are created using the method \code{Timer::configure}.
+Timers can be configured with a callback function pointer of type \code{void(*)(Timer*)} and a timeout interval.
+Unlike the timeout parameter in the \code{async} API the timer intervals are defined as \emph{microseconds}.
+
+On creation timers are \emph{stopped}.
+To start a timer the method \code{start} on the instance is used.
+Started timers run until the method \code{stop} is called on the timer instance.
+It is also possible to reconfigure the callback and the interval.
+Both can be done while the timer is running.
+When updating the interval the elapsed time is not reset.
+Restarting an already running timer resets the elapsed time.
+
+The number of available timers is fixed and currently limited to 3.
+It is recommended to minimize the number of timers as the microsecond precision requires frequent checking of all timers which may negatively impact system performance.
+When microsecond precision is not required using \code{async} should be considered!
+
+\section{Button Inputs}
+Button states are received from the IOIB.
+To facilitate control logic implementation these button states are tracked in their own data model that can be directly queried by the control logic.
+There exist two quering implementation:
+
+\section{Single-Button Querying}
+The simple querying method method \code{Buttons::read(uint8\_t id)} accepts a button id and returns the button state -- \code{true} if the button is currently pressed.
+The button id is equivalent to the ids used during transmission.
+
+\section{List Querying}
+The list-querying method can be used if multiple buttons need to be queried at once:
+\code{Buttons::readList(byte* buttons, byte len, byte* firstIdx, byte* lastIdx)}
+
+The first parameter (\code{buttons}) is a list of button ids, the second parameter (\code{len}) the list size.
+Up to 255 button ids may be passed.
+The last two parameters are used to provide feedback about the first and last button pressed.
+
+The method checks all buttons in the list.
+After the execution the parameter \code{firstIdx} will hold the list index of the first pressed button and \code{lastIdx} the list index of the last pressed button.
+If the first or last index is not required, \code{nullptr} should be passed to the disable the index tracking.
+During the execution each button id in the list will be replaced by its state -- \code{0} if the button is not pressed, \code{1} if it is.
+Additionally the method returns the number of pressed buttons as the return value.
+
+\section{Command Output API}
+Commands are not issued by control logic directly.
+Instead for each decoder type there exists an output API handling the system state, command output and command repetition.
+The following sections outline the APIs for each decoder type.
+
+\subsection{Switch Output}
+The switches use a relatively simple API with one primary method:
+
+\code{Switches::setSwitch(byte adr, Switches::STATUS state)}
+
+This method accepts a switch address and a switch state.
+The address encodes both the decoder address and the switch address on the decoder.
+The high nibble encodes the decoder id and the low nibble encodes the switch address.
+Both are 1-indexed:
+The second switch on the third decoder has the id $0x32$.
+Incidentially this switch would be encoded in commands as \code{W32}.
+
+The state parameter indicates the desired switch state: If a switch should be reset -- \ie we no longer care about the state of the switch -- the state \code{UNKNOWN} should be used.
+For normal switching the states \code{STRAIGHT} and \code{DIVERGING} can be used.
+
+\subsubsection{Command Generation}
+The switch output API manages \emph{command staggering}:
+In order to not overload the power delivery to the switches we do not send multiple commands at once.
+If multiple switches are set at once the commands are issued individually with configurable delay between two switching actions.
+This delay is currently set to 100 milliseconds.
+
+\subsubsection{Command Repetition}
+While there are no pending switching actions we regularly generate \emph{repetition} commands.
+These commands encode all switches at once.
+Generally these commands should not cause any switches to move -- the normal commands should already have been executed.
+But if a switch decoder is disconnected or has missed a command the command repetition guarantees eventual consistency.
+Repetion commands are sent once per second and in each second we transmit the commands for one decoder.
+With the current scope of 5 decoders this ensures consistency of all switches within 5 seconds.
+
+While there are pending switching actions we suppress the repetition commands.
+
+\subsubsection{Forced Execution}
+The switch output API also supports forced repetition of all switch commands.
+This is triggered by the function \code{Switches::sendForcedUpdates()}.
+
+This can be used in cases where the switch power supply has been disconnected.
+In this case eventual consistency is not guaranteed since the decoders may have triggered a switching action that had no effect since the power supply was disconnected.
+With \emph{forced execution} the switch decoders are instructed to repeat all switching action \emph{in hardware}.
+These instructions are staggered just like normal commands.
+
+While transmitting forced execution commands normal switching and command repetition are interrupted.
+Normal operation is resumed upon completion of this routine.
+With the current scope of 5 decoders the forced execution requires 3 seconds to complete.
+
+\subsection{Entry Signals}
+The entry signals are set using the following method:
+
+\code{EntrySignals::setSignal(byte adr, SignalLevel prim, SignalLevel sec)}
+
+The signal address is encoded by the first parameter (\code{adr}).
+Just like the switches this encodes both the chip address in the high nibble and the signal id in the low nibble:
+For example the first entry signal of the second decoder -- encoded on the bus as \code{E2a} -- has the id $0x21$.
+
+The parameters \code{prim} and \code{sec} encode the signal aspect of the home signal and distance signal respectively.
+There are 4 valid signal aspects:
+\code{HALT} (\textbf{0}/\textbf{0*}), \code{FREE} (\textbf{1}/\textbf{1*}), \code{SLOW\_40} (\textbf{2}/\textbf{2*}) and \code{SLOW\_60} (\textbf{3}/\textbf{3*}).
+When \code{prim} is \code{HALT} the value of \code{sec} is irrelevant as the distance signal will be turned off when the home signal displays aspect \textbf{0}.
+
+\subsubsection{Command Repetition}
+Entry signals support command repetion and the commands are repeated once per second.
+Each second one decoder is targeted.
+
+\subsection{Exit Signals}
+The exit signals are set using the following method:
+
+\code{ExitSignals::setSignal(byte adr, byte channel, SignalLevel level)}
+
+The decoder address is provided using the first parameter (\code{adr}).
+This holds the decoder address directly. 
+The signal channel on the decoder is passed using the second parameter (\code{channel}) as a 1-indexed id.
+For example, Singal 3 of decoder 1 would have use $adr=1$ and $channel=3$.
+The signal aspect is provided using the parameter \code{level}.
+
+\subsubsection{Command Repetition}
+Exit signals support command repetition and the commands are repeated once per second.
+Each second one decoder is targeted.
+
+\subsection{Lighting}
+Lighting is controlled using the command \code{Lights::setPin(byte adr, bool state)}.
+
+The light pin address \code{adr} encodes both the decoder address and the pin id on the decoder:
+The high nibble encodes the decoder address and the low nibble the pin number on the decoder.
+It is important to note that the pin number is 0-indexed:
+There are 16 pins per chip and by indexing them $0x00$ to $0x0f$ we can fit all pin ids in one nibble.
+
+The parameter \code{state} defines if the pin should be turned on or off.
+
+\subsubsection{Staggered Output}
+In order to achieve nice transient behaviour in the light control without forcing the control logic to handle this, the light output API introduces randomized delays in all changes to lighting pins.
+
+
+\subsubsection{Command Repetion}
+While there are no pending pin updates we send repetition commands once per second.
+Each second we transmit a repetion command for one decoder.
 
 \end{document}
