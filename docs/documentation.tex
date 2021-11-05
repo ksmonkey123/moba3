@@ -1000,11 +1000,11 @@ Button states are received from the IOIB.
 To facilitate control logic implementation these button states are tracked in their own data model that can be directly queried by the control logic.
 There exist two quering implementation:
 
-\section{Single-Button Querying}
+\subsection{Single-Button Querying}
 The simple querying method method \code{Buttons::read(uint8\_t id)} accepts a button id and returns the button state -- \code{true} if the button is currently pressed.
 The button id is equivalent to the ids used during transmission.
 
-\section{List Querying}
+\subsection{List Querying}
 The list-querying method can be used if multiple buttons need to be queried at once:
 \code{Buttons::readList(byte* buttons, byte len, byte* firstIdx, byte* lastIdx)}
 
@@ -1201,6 +1201,16 @@ If there is any normal command to be sent it is sent before any repetition.
 The following sections contain reference pictures for the control board and the model railway.
 These pictures are labelled to identify individual components.
 
+In the railway reference pictures switches are labelled in red while signals are labelled in green.
+The signals are labelled based on their decoder -- \eg the signal \code{E2a} is the first entry signal on decoder 2.
+Entry signals are labelled with \code{E}, exit signals with \code{A}.
+
+The switches have 2 labels:
+The \emph{hardware label} is based on the section of track the switch belongs to:
+\code{Y} for the shadow yard, \code{T} for track switches, \code{L} for the left station entry and \code{R} for the right station entry.
+Each switch label also contains a \emph{decoder} address:
+This address consists of the decoder id and the switch channel on the decoder -- \eg the switch with the label \code{L2(5.6)} is switch 6 on decoder 5.
+
 \pagebreak
 \section{Control Board}
 \begin{figure}[h!]
@@ -1250,6 +1260,7 @@ These pictures are labelled to identify individual components.
 	\centering
 	\includegraphics[width=0.8\textwidth]{ref/right rear}
 	\caption{Station Entry Right: Rear View}
+	Note: \code{A1.4/5} is an old label. The current one would be \code{A1.4}!
 \end{figure}
 \begin{figure}[h!]
 	\centering
