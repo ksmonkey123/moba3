@@ -12,6 +12,11 @@ namespace Util {
      * @param buffer the output buffer. needs at least 2 bytes of space.
      */
     void byteToHex(byte data, char* buffer);
+
+    union Raw16 {
+        uint16_t value;
+        uint8_t raw[2];
+    };
 }
 
 #endif

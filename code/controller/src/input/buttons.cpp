@@ -3,6 +3,7 @@
 #include "../settings.h"
 #include "../utils.h"
 #include "../output/switches.h"
+#include "../async.h"
 
 /** a single 16-bit button sector */
 struct ButtonSector {
@@ -18,6 +19,13 @@ static ButtonModel _buttons;
 
 void Buttons::init() {
     memset(&_buttons, 0, sizeof(ButtonModel));
+}
+
+static uint8_t pulsedId;
+
+static void disablePulsed() {
+    ButtonSector* sector = &_buttons.sector[(pulsedId >> 4) & 0x0f];
+    sector->button[pulsedId & 0x0f] = false;
 }
 
 void Buttons::processInput(char* buffer) {
@@ -36,15 +44,22 @@ void Buttons::processInput(char* buffer) {
         return;
     }
 
-    ButtonSector* sector = &_buttons.sector[buffer[0] - '0'];
+    auto sectorId = buffer[0] - '0';
+    ButtonSector* sector = &_buttons.sector[sectorId];
     auto id = Util::decodeHexString(buffer + 1, 1);
     auto direction = buffer[2];
 
-    if (id == -1 || (direction != '+' && direction != '-')) {
+    if (id == -1 || (direction != '+' && direction != '-' && direction != '*')) {
         return;
     }
 
-    sector->button[id] = direction == '+';
+    if (direction == '*') {
+        pulsedId = ((sectorId << 4) & 0xf0) + (id & 0x0f);
+        sector->button[id] = true;
+        async(disablePulsed, 500);
+    } else {
+        sector->button[id] = direction == '+';
+    }
 }
 
 boolean Buttons::read(byte id) {

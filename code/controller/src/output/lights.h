@@ -9,7 +9,7 @@ namespace Lights {
 
     void getNextCommand(char* buffer);
     void getRepetitionCommand(char* buffer);
-
+    
 }
 
 #endif
