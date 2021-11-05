@@ -9,6 +9,7 @@
 \usepackage{amsmath,mleftright}
 \usepackage{euler}
 \usepackage{xparse}
+\usepackage[toc]{appendix}
 
 \counterwithout{footnote}{chapter}
 \usepackage{graphicx}
@@ -1100,7 +1101,7 @@ Exit signals support command repetition and the commands are repeated once per s
 Each second one decoder is targeted.
 
 \subsection{Lighting}
-Lighting is controlled using the command \code{Lights::setPin(byte adr, bool state)}.
+Lighting is controlled using the method \code{Lights::setPin(byte adr, bool state)}.
 
 The light pin address \code{adr} encodes both the decoder address and the pin id on the decoder:
 The high nibble encodes the decoder address and the low nibble the pin number on the decoder.
@@ -1110,11 +1111,154 @@ There are 16 pins per chip and by indexing them $0x00$ to $0x0f$ we can fit all 
 The parameter \code{state} defines if the pin should be turned on or off.
 
 \subsubsection{Staggered Output}
-In order to achieve nice transient behaviour in the light control without forcing the control logic to handle this, the light output API introduces randomized delays in all changes to lighting pins.
+We want to achieve nice transient behaviour in the light control without forcing the control logic to handle this.
+The light output API introduces randomized delays in all changes to lighting pins.
+Instead of sending all pending updates at once we send single-pin updates with a random pin selection and a fixed delay between selections.
 
+Please note that the random selection of a pin is performed in two stages:
+First a decoder with pending pin updates is chosen at random.
+After that a single pending pin on that decoder is chosen.
+This means that not all pins have equal probability of being updated:
+A single pin on a decoder with few pending updates is more likely to be transmitted than a pin on a decoder with many pending updates.
+Using a fairer selection system where each pin has the same probability of being selected would reduce performance.
+The multi-stage logic improves performance since we never consider pins on decoders without pending updates.
+The worst case scenario is simply a single pin update.
+In this situation we only have one valid selection.
+The currently used logic allows us to reduce the average number of iterations to find such a single pin update from $32.5$ to $11$.\footnote{The current logic simply makes pseudo-random selections until a valid selection has been made. This calculation assumes an equal distribution of random values and the current decoder count of 4 light decoders with 16 pins each.}
 
 \subsubsection{Command Repetion}
 While there are no pending pin updates we send repetition commands once per second.
 Each second we transmit a repetion command for one decoder.
+
+\newpage
+\subsection{Control Panel Display}
+The control panel LEDs are controlled using the following method:
+
+\code{Display::set(byte sector, byte data, byte mask)}
+
+The display LEDs are separated into 6 sectors of 8 LEDs each.
+The parameter \code{sector} selects the sector that should be updated (0-indexed).
+The parameter \code{data} encodes the LED states.
+The last parameter -- \code{mask} -- encodes an update mask:
+Only the bits that are set in the mask are updated on the display data model.
+Example:
+If the sector currently has the data $0x2f$, the new data is $0xf0$ and the mask is $0xc3$, the resulting sector data will be $0xec$:
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ | l | c | c |}
+\hline
+original data: 	& $0010.1111$ & $0x2f$ \\
+mask:				& $1100.0011$ & $0xc3$ \\\hline
+retained data:  & $0010.1100$ & $0x2c$ \\\hline\hline
+new data: 		& $1111.0000$ & $0xf0$ \\
+mask:				& $1100.0011$ & $0xc3$ \\\hline
+masked data:		& $1100.0000$ & $0xc0$ \\\hline\hline
+merged data:    & $1110.1100$ & $0xec$ \\\hline
+\end{tabular}
+\caption{sector update example}
+\end{table}
+
+The entire calculation can be reduced to the following formula:
+\[ state' = (state \oplus mask) \lor (data \land mask) \]
+
+\subsubsection{Dark Mode}
+The control panel supports a \emph{dark mode}:
+In this mode the LEDs are normally disabled.
+Only when the display data changes the LEDs are powered for a limited time\footnote{currently 1 second} to indicate the change.
+After that they are cleared once again.
+The LED \code{1.7} is used as the indicator for this mode:
+This LED is enabled whenever \emph{dark mode} is active.
+
+The mode is toggled using \code{Display::toggleDarkMode()}.
+
+\subsubsection{Command Repetition}
+The control panel state is transmitted whenever there is a change in the data and additional as a repetition command once every second.
+
+\section{Data Bus Output}
+It has to be expected that control panel inputs trigger many commands at once: Setting switches, updating signal aspects, updating the control panel display.
+In order not to overload the decoders with commands to parse and respond to the controller spreads these commands out over some time:
+We send \emph{at most} one command per 100 microseconds.
+If the command lengths require slower transmission -- \ie after one transmission delay the previous one has not yet finished -- one period is simply skipped to let the data bus catch up.
+
+The data bus also prioritises some commands over others.
+Currently the command priorities are ordered as such:
+
+\begin{enumerate}
+\item Switches
+\item Entry Signals
+\item Exit Signals
+\item Control Panel Display
+\item Lighting
+\end{enumerate}
+
+This ordering is used for normal commands and for command repetition.
+In general normal commands are priorizied above any command repetition:
+If there is any normal command to be sent it is sent before any repetition.
+
+\begin{appendices}
+\chapter{Reference Pictures}
+The following sections contain reference pictures for the control board and the model railway.
+These pictures are labelled to identify individual components.
+
+\pagebreak
+\section{Control Board}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[height=0.95\textwidth, angle=90]{ref/control board}
+    \caption{Control Board: red labels identify buttons, green labels the output LEDs }
+\end{figure}
+
+\section{Railway Components}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{ref/yard entry}
+    \caption{Shadow Station: Entry Track}
+\end{figure}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ref/yard 2}
+    \caption{Shadow Station: Primary Switching Area}
+\end{figure}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ref/yard 3}
+    \caption{Shadow Station: Auxilliary Switching Area}
+\end{figure}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ref/yard secondary exit and track spiral}
+    \caption{Shadow Station: Secondary Station Exit (Y11-Y13)}
+				Track Switches: Right Spiral (T1/T2)
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{ref/track top}
+	\caption{Track Switches: Surface Switches}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{ref/left overview}
+	\caption{Station Entry Left: Overview}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{ref/left details}
+	\caption{Station Entry Left: Details View}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{ref/right rear}
+	\caption{Station Entry Right: Rear View}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{ref/right front}
+	\caption{Station Entry Right: Front View}
+\end{figure}
+
+
+
+\end{appendices}
 
 \end{document}
