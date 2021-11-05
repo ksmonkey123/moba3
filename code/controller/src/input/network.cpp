@@ -3,18 +3,18 @@
 #include "buttons.h"
 
 static char buffer[3];
-static char buffer_length;
+static byte buffer_length;
 
 void Network::init() {
     Serial.begin(NETWORK_BAUDRATE);
     Serial.println();
-    Serial.println("----------------------");
-    Serial.println("starting controller...");
-    Serial.println("build date:");
-    Serial.print  (__DATE__);
-    Serial.print  (" - ");
-    Serial.println(__TIME__);
-    Serial.println("----------------------");
+    Serial.println(F("----------------------"));
+    Serial.println(F("starting controller..."));
+    Serial.println(F("build date:"));
+    Serial.print  (F(__DATE__));
+    Serial.print  (F(" - "));
+    Serial.println(F(__TIME__));
+    Serial.println(F("----------------------"));
     delay(1000);
 }
 

@@ -2,9 +2,6 @@
 
 enum Entry { NONE, LEFT, RIGHT};
 
-static byte currentTrack = -1;
-static Entry currentEntry = NONE;
-
 static void doReset() {
     Switches::setSwitch(SWITCH_YARD_01, Switches::UNKNOWN);
     Switches::setSwitch(SWITCH_YARD_02, Switches::UNKNOWN);

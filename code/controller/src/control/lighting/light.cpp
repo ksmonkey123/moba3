@@ -21,42 +21,30 @@ static void fullUpdate() {
     }
 }
 
+static ButtonEdge button_start (BUTTON_KEYBOARD_03);
+static ButtonEdge button_prev  (BUTTON_KEYBOARD_04);
+static ButtonEdge button_next  (BUTTON_KEYBOARD_05);
+
 static void singleLightBrowser() {
     static byte lightId = 0x10;
-    static boolean fired = false;
-    
-    boolean button_start = Buttons::read(BUTTON_KEYBOARD_03);
-    boolean button_prev  = Buttons::read(BUTTON_KEYBOARD_04);
-    boolean button_next  = Buttons::read(BUTTON_KEYBOARD_05);
 
-    if (fired) {
-        fired = button_start | button_prev | button_next;
-        if (fired) {
-            return;
-        }
-    }
-
-    if (button_start) {
+    if (button_start.test()) {
         if (lightId != 0x10) {
             Lights::setPin(lightId, false);
             lightId = 0x10;
         }
         Lights::setPin(lightId, true);
-    } else if (button_prev) {
+    } else if (button_prev.test()) {
         Lights::setPin(lightId, false);
         if (--lightId < 0x10) {
             lightId = (LIGHT_DECODER_COUNT * 0x10) + 0x0f;
         }
         Lights::setPin(lightId, true);
-    } else if (button_next) {
+    } else if (button_next.test()) {
         Lights::setPin(lightId, false);
         if (++lightId >= (LIGHT_DECODER_COUNT + 1) * 0x10) {
             lightId = 0x10;
         }
         Lights::setPin(lightId, true);
-    } else {
-        fired = false;
-        return;
     }
-    fired = true;
 }

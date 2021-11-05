@@ -46,10 +46,10 @@ void Buttons::processInput(char* buffer) {
 
     auto sectorId = buffer[0] - '0';
     ButtonSector* sector = &_buttons.sector[sectorId];
-    auto id = Util::decodeHexString(buffer + 1, 1);
+    byte id = Util::decodeHexNibble(buffer[1]);
     auto direction = buffer[2];
 
-    if (id == -1 || (direction != '+' && direction != '-' && direction != '*')) {
+    if (id == 0xff || (direction != '+' && direction != '-' && direction != '*')) {
         return;
     }
 

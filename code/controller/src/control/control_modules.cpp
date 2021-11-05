@@ -1,7 +1,7 @@
 #include "control_modules.h"
 #include "../timer.h"
 
-static void process(Timer* timer) {
+static void process(Timer*) {
     Yard::tick();
     Tracks::tick();
     Station::Left::tick();

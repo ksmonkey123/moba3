@@ -4,12 +4,14 @@
 static byte timerCount;
 static Timer timers[TIMER_COUNT];
 
+#ifdef DEBUG_LOG
 static void logTimerCreation() {
     Serial.print("T ");
     Serial.print(timerCount);
     Serial.print('/');
     Serial.println(TIMER_COUNT);
 }
+#endif
 
 static void freezeTooManyTimers() {
     while (true) {

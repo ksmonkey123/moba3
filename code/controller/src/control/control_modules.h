@@ -4,6 +4,7 @@
 #include <Arduino.h>
 
 #include "../input/buttons.h"
+#include "../input/buttonEdge.h"
 #include "../input/buttonMapping.h"
 
 #include "../output/signalLevel.h"

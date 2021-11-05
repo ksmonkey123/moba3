@@ -31,7 +31,7 @@ void Lights::setPin(uint8_t id, boolean on) {
         dec->state.value = state;
         dec->dirt_mask |= mask;
         model.dirty = true;
-        StatusLED::blink;
+        StatusLED::blink();
     }
 }
 
@@ -52,6 +52,7 @@ static void nextCommand(char* buffer) {
         // last call was too recent
         return;
     }
+    lastCall = millis();
 
     // randomly choose a decoder
     uint8_t decId;
@@ -65,7 +66,6 @@ static void nextCommand(char* buffer) {
     do {
         auto pinId = random(0, 16);
         mask.value = 0x0001 << pinId;
-        uint16_t collider = decoder->dirt_mask & mask.value;
     } while ((decoder->dirt_mask & mask.value) == 0);
     boolean state = (decoder->state.value & mask.value) != 0;
 

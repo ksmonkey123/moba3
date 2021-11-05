@@ -178,6 +178,7 @@ static void buildPath(byte track, byte entry) {
         switch(track) {
             case 0:
                 paths[1].target = -1;
+                __attribute__ ((fallthrough));
             case 1:
                 paths[2].target = -1;
         }

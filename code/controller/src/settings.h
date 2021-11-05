@@ -33,6 +33,6 @@
 #define SWITCH_STAGGERING_PERIOD    100    // [ms]
 #define SIGNAL_UPGRADE_DELAY       1000    // [ms]
 #define COMMAND_REPETITION_PERIOD  1000    // [ms]
-#define LIGHT_STAGGERING_PERIOD     100    // [ms]
+#define LIGHT_STAGGERING_PERIOD      10    // [ms]
 
 #endif

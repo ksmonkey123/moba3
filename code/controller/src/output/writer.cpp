@@ -11,7 +11,7 @@
 #include "../settings.h"
 #include "../macros.h"
 
-static void tick(Timer* timer);
+static void tick(Timer*);
 
 void Writer::init() {
     Timer::create(NETWORK_TIMER_PERIOD, tick)->start();
@@ -48,7 +48,7 @@ void fillBuffer() {
     }
 }
 
-static void tick(Timer* timer) {
+static void tick(Timer*) {
     if (index == 0) {
         fillBuffer();
     }

@@ -43,7 +43,7 @@ void EntrySignals::setSignal(byte id, SignalLevel primary, SignalLevel secondary
         }
         sig->dirty = true;
         dec->dirty = true;
-        StatusLED::blink;
+        StatusLED::blink();
     }
 }
 

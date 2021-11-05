@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 namespace Util {
-    unsigned long decodeHexString(char* string, char length);
+    byte decodeHexNibble(char string);
     /**
      * convert a single byte of data to the 2-character hex representation.
      * 
