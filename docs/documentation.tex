@@ -18,7 +18,7 @@
 \title{MOBA3 Control System}
 \subtitle{
 Model Railway Control System\\
-System Design Specification and Documentation\\\ \\
+System Specification and Design Documentation\\\ \\
 Rev. B}
 \author{Andreas Wälchli}
 \date{\today}
@@ -789,7 +789,7 @@ In this case the behaviour is undefined.
 Example: \texttt{A1a0b1c2c3\n} \\
 Regex: \texttt{A[1-9+]([a-d][0-3])\{1,4\}\n}
 
-\section{Entry Signal Commands}
+\section{Entry Signal Decoder}
 The entry signal decoders support up to 2 entry signals.
 Entry signals are combined home and distance signals.
 The home signal displays the signal aspect for the entry while the distance signal announces the aspect of the exit signal at the end of the station track the train is directed to.
@@ -1000,11 +1000,11 @@ Button states are received from the IOIB.
 To facilitate control logic implementation these button states are tracked in their own data model that can be directly queried by the control logic.
 There exist two quering implementation:
 
-\section{Single-Button Querying}
+\subsection{Single-Button Querying}
 The simple querying method method \code{Buttons::read(uint8\_t id)} accepts a button id and returns the button state -- \code{true} if the button is currently pressed.
 The button id is equivalent to the ids used during transmission.
 
-\section{List Querying}
+\subsection{List Querying}
 The list-querying method can be used if multiple buttons need to be queried at once:
 \code{Buttons::readList(byte* buttons, byte len, byte* firstIdx, byte* lastIdx)}
 
@@ -1049,7 +1049,7 @@ While there are no pending switching actions we regularly generate \emph{repetit
 These commands encode all switches at once.
 Generally these commands should not cause any switches to move -- the normal commands should already have been executed.
 But if a switch decoder is disconnected or has missed a command the command repetition guarantees eventual consistency.
-Repetion commands are sent once per second and in each second we transmit the commands for one decoder.
+Repetition commands are sent once per second and in each second we transmit the commands for one decoder.
 With the current scope of 5 decoders this ensures consistency of all switches within 5 seconds.
 
 While there are pending switching actions we suppress the repetition commands.
@@ -1082,7 +1082,7 @@ There are 4 valid signal aspects:
 When \code{prim} is \code{HALT} the value of \code{sec} is irrelevant as the distance signal will be turned off when the home signal displays aspect \textbf{0}.
 
 \subsubsection{Command Repetition}
-Entry signals support command repetion and the commands are repeated once per second.
+Entry signals support command repetition and the commands are repeated once per second.
 Each second one decoder is targeted.
 
 \subsection{Exit Signals}
@@ -1126,9 +1126,9 @@ The worst case scenario is simply a single pin update.
 In this situation we only have one valid selection.
 The currently used logic allows us to reduce the average number of iterations to find such a single pin update from $32.5$ to $11$.\footnote{The current logic simply makes pseudo-random selections until a valid selection has been made. This calculation assumes an equal distribution of random values and the current decoder count of 4 light decoders with 16 pins each.}
 
-\subsubsection{Command Repetion}
+\subsubsection{Command Repetition}
 While there are no pending pin updates we send repetition commands once per second.
-Each second we transmit a repetion command for one decoder.
+Each second we transmit a repetition command for one decoder.
 
 \newpage
 \subsection{Control Panel Display}
@@ -1201,6 +1201,16 @@ If there is any normal command to be sent it is sent before any repetition.
 The following sections contain reference pictures for the control board and the model railway.
 These pictures are labelled to identify individual components.
 
+In the railway reference pictures switches are labelled in red while signals are labelled in green.
+The signals are labelled based on their decoder -- \eg the signal \code{E2a} is the first entry signal on decoder 2.
+Entry signals are labelled with \code{E}, exit signals with \code{A}.
+
+The switches have 2 labels:
+The \emph{hardware label} is based on the section of track the switch belongs to:
+\code{Y} for the shadow yard, \code{T} for track switches, \code{L} for the left station entry and \code{R} for the right station entry.
+Each switch label also contains a \emph{decoder} address:
+This address consists of the decoder id and the switch channel on the decoder -- \eg the switch with the label \code{L2(5.6)} is switch 6 on decoder 5.
+
 \pagebreak
 \section{Control Board}
 \begin{figure}[h!]
@@ -1250,6 +1260,7 @@ These pictures are labelled to identify individual components.
 	\centering
 	\includegraphics[width=0.8\textwidth]{ref/right rear}
 	\caption{Station Entry Right: Rear View}
+	Note: \code{A1.4/5} is an old label. The current one would be \code{A1.4}!
 \end{figure}
 \begin{figure}[h!]
 	\centering
