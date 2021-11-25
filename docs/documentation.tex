@@ -210,7 +210,7 @@ This makes it useful for \emph{serial-to-parallel} data output.
 Both shift registers can be read and written using SPI hardware in mode $(0,0)$.
 
 \section{Data Bus Specification}
-The \textsc{Moba3} control system is based on a UART serial bus with a baudrate of 9600.\footnote{higher baudrates up to 2 Mbaud are theoretically possible}
+The \textsc{Moba3} control system is based on a UART serial bus with a baudrate of 250000.\footnote{higher baudrates up to 2 Mbaud are theoretically possible}
 The data is transmitted over differential pairs on an RS422/RS485 derived serial bus.
 The differential pairs are driven using MAX481 compatible transceivers operating at 5V.
 Physically the data bus uses 8P8C (RJ45) connections for both power (5V only) and data.
