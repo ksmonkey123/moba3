@@ -52,6 +52,8 @@ uint16_t determineBaseMaskBit(uint8_t channelId) {
       return 0x0400;
     case 5:
       return 0x1000;
+    default:
+      return 0x0000;
   }
 }
 

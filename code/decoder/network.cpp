@@ -4,7 +4,7 @@
 static CallbackFunction m_callback;
 
 static char buffer[NETWORK_BUFFER_SIZE];
-static char buffer_length;
+static byte buffer_length;
 
 void idle(char c);
 void hit(char c);

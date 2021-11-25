@@ -21,10 +21,12 @@ void Logic::init() {
             _logicConfig.init = Signal::init;
             _logicConfig.process = Signal::process;
             _logicConfig.tick = Signal::tick;
+            break;
         case ::Config::Type::EXIT:
             _logicConfig.init = ExitSignal::init;
             _logicConfig.process = ExitSignal::process;
             _logicConfig.tick = ExitSignal::tick;
+            break;
     }
 
     if (_logicConfig.init != nullptr) {

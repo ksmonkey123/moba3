@@ -4,10 +4,19 @@
 #include "../model/display.h"
 
 static char buffer[13];
-static char buffer_length;
+static byte buffer_length;
 
 void Network::init() {
     Serial.begin(NETWORK_BAUDRATE);
+    Serial.println();
+    Serial.println(F("----------------------"));
+    Serial.println(F("starting IOIB..."));
+    Serial.println(F("build date:"));
+    Serial.print  (F(__DATE__));
+    Serial.print  (F(" - "));
+    Serial.println(F(__TIME__));
+    Serial.println(F("----------------------"));
+    delay(1100);
 }
 
 void processCharacter(char c) {

@@ -5,7 +5,7 @@
 // # UART settings #
 // #################
 // - transmission speed
-#define NETWORK_BAUDRATE 9600
+#define NETWORK_BAUDRATE 250000
 // - the maximum number of characters that can be consumed between logic ticks. larger values may starve the logic classes of CPU cycles
 #define NETWORK_MAX_ITERATIONS 10
 

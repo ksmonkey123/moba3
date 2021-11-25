@@ -16,7 +16,7 @@ uint16_t Util::decodeHexString16(char* string) {
 
     container.value = 0;
 
-    for(char i = 0; i < 4; i++) {
+    for(byte i = 0; i < 4; i++) {
         container.value *= 16;
         char digit = string[i];
         if (digit >= '0' && digit <= '9') {

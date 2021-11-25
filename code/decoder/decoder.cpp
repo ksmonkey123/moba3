@@ -6,8 +6,8 @@
 #include "config.h"
 
 void setup() {
-  _chipConfig.type = Config::Type::LIGHT;
-  _chipConfig.address = '1';
+  _chipConfig.type = Config::Type::SWITCH;
+  _chipConfig.address = '5';
 
   Logic::init();
   Network::init(_logicConfig.process);

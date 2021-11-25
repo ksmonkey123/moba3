@@ -3,7 +3,6 @@
 
 namespace Config {
     enum Type {
-        NONE = 0,
         SWITCH = 'W',
         LIGHT = 'L',
         ENTRY = 'E',

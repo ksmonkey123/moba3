@@ -4,7 +4,7 @@
 
 unsigned long Util::decodeHexString(char* string, char length) {
     unsigned long x = 0;
-    for(char i = 0; i < length; i++) {
+    for(byte i = 0; i < length; i++) {
         x *= 16;
         char digit = string[i];
         if (digit >= '0' && digit <= '9') {
