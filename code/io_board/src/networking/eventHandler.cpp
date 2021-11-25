@@ -2,7 +2,9 @@
 #include "../utils.h"
 
 void EventHandler::handle(byte channel, uint16_t state, uint16_t mask) {
-    static char buffer[4];
+    static char buffer[5];
+    buffer[3] = '\n';
+    buffer[4] = '\0';
     for (byte bit = 0; bit < 16; bit++) {
         // scan mask for a set bit
         uint16_t scanmask = 1 << bit;
@@ -13,7 +15,7 @@ void EventHandler::handle(byte channel, uint16_t state, uint16_t mask) {
             Util::byteToHex(channel << 4 | bit, buffer);
             buffer[2] = set ? '+' : '-';
 
-            Serial.println(buffer);
+            Serial.print(buffer);
         }
     }
 

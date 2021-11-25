@@ -8,14 +8,13 @@ static byte buffer_length;
 
 void Network::init() {
     Serial.begin(NETWORK_BAUDRATE);
-    Serial.println();
-    Serial.println(F("----------------------"));
-    Serial.println(F("starting IOIB..."));
-    Serial.println(F("build date:"));
+    Serial.print(F("\n----------------------\n"));
+    Serial.print(F("starting IOIB...\n"));
+    Serial.print(F("build date:\n"));
     Serial.print  (F(__DATE__));
     Serial.print  (F(" - "));
-    Serial.println(F(__TIME__));
-    Serial.println(F("----------------------"));
+    Serial.print(F(__TIME__));
+    Serial.print(F("\n----------------------\n"));
     delay(1100);
 }
 
