@@ -18,7 +18,9 @@ void Network::init() {
 }
 
 void processCharacter(char c) {
-    if (c == '\n') {
+    if (c == '\r') {
+        // ignore CR
+    } else if (c == '\n') {
         if (buffer_length == 3) {
              Buttons::processInput(buffer);
         }
