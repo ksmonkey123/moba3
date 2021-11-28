@@ -20,4 +20,5 @@ void loop() {
     Transfer::transfer(displayBuffer, buttonBuffer);
     Buttons::update(buttonBuffer);
     StatusLED::tick();
+    Display::tick();
 }

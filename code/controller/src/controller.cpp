@@ -16,6 +16,7 @@ void setup() {
     StatusLED::force_on();
     Network::init();
     Buttons::init();
+    Display::init();
     initControllers();
     Writer::init();
     StatusLED::force_off();

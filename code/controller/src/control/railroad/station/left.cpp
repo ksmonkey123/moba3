@@ -22,6 +22,11 @@ static void doReset() {
     Switches::setSwitch(SWITCH_LEFT_3, Switches::UNKNOWN);
     Switches::setSwitch(SWITCH_LEFT_4, Switches::UNKNOWN);
     Switches::setSwitch(SWITCH_LEFT_5, Switches::UNKNOWN);
+    EntrySignals::setSignal(ENTRY_SIGNAL_LEFT, SignalLevel::HALT, SignalLevel::HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_L, 0, HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_L, 1, HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_L, 2, HALT);
+    ExitSignals::setSignal(EXIT_SIGNALS_L, 3, HALT);
     Display::set(3, 0x00, 0xff);
     Display::set(5, 0x00, 0x0f);
 }
@@ -83,7 +88,7 @@ static void processDisplay() {
 
     // process main path
     if (paths[0].target >= 0) {
-        byte segment = paths[0].direction == DISABLED ? 0x03 : paths[0].direction == ENTRY ? 0x01 : 0x02;
+        byte segment = paths[0].direction == DISABLED ? 0x03 : paths[0].direction == ENTRY ? 0x02 : 0x01;
         sector_3 |= segment << (paths[0].target * 2);
         if (segment != 0x03) {
             segment ^= 0x03;

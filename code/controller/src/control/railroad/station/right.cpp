@@ -80,7 +80,7 @@ static boolean processSwitches(byte entry, byte track) {
             Switches::setSwitch(SWITCH_RIGHT_1, Switches::STRAIGHT);
             Switches::setSwitch(SWITCH_RIGHT_2, Switches::DIVERGING);
             Switches::setSwitch(SWITCH_RIGHT_3, Switches::STRAIGHT);
-            Switches::setSwitch(SWITCH_RIGHT_6, Switches::DIVERGING);
+            Switches::setSwitch(SWITCH_RIGHT_6, Switches::STRAIGHT);
             return true;
         }
         // outer access
@@ -123,7 +123,7 @@ static void processDisplay() {
 
     // process inner path
     if (innerPath.target >= 0) {
-        byte segment = innerPath.direction == DISABLED ? 0x03 : innerPath.direction == ENTRY ? 0x01 : 0x02;
+        byte segment = innerPath.direction == DISABLED ? 0x03 : innerPath.direction == ENTRY ? 0x02 : 0x01;
         sector_4 |= segment << (innerPath.target * 2);
         if (segment != 0x03) {
             segment ^= 0x03;
@@ -132,7 +132,7 @@ static void processDisplay() {
     }
     // process outer path
     if (outerPath.target >= 0) {
-        byte segment = outerPath.direction == DISABLED ? 0x03 : outerPath.direction == ENTRY ? 0x01 : 0x02;
+        byte segment = outerPath.direction == DISABLED ? 0x03 : outerPath.direction == ENTRY ? 0x02 : 0x01;
         sector_4 |= segment << (outerPath.target * 2);
         if (segment != 0x03) {
             segment ^= 0x03;

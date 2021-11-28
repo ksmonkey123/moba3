@@ -1,6 +1,7 @@
 #include "control_modules.h"
 
 void ForcedUpd::tick() {
+    return;
     static bool state = false;
     bool newState = Buttons::read(BUTTON_SWITCHES_DISABLED);
     

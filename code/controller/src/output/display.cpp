@@ -16,9 +16,13 @@ static struct Data {
     } darkmode;
 } _data;
 
+void Display::init() {
+    set(1, 0xff, 0x20);
+}
+
 void Display::toggleDarkmode() {
     _data.darkmode.active = !_data.darkmode.active;
-    set(1, _data.darkmode.active ? 0xff : 0x00, 0x80);
+    set(1, _data.darkmode.active ? 0xff : 0x00, 0x40);
 }
 
 void Display::set(byte sector, byte data, byte mask) {
@@ -55,7 +59,7 @@ void Display::getNextCommand(char* buffer) {
                 buffer[i] = '0';
             }
             buffer[0] = 'D';
-            buffer[3] = '8';
+            buffer[3] = '6';
             buffer[13] = '\n';
             buffer[14] = '\0';
             memcpy(lastCommand, buffer, 14);

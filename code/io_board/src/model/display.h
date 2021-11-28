@@ -6,6 +6,7 @@
 namespace Display {
     void processCommand(char* buffer);
     uint16_t* getBuffer();
+    void tick();
 }
 
 #endif

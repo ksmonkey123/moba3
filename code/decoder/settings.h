@@ -25,7 +25,7 @@
 // ####################
 
 // - the pulse length for a short switching impulse. (ms)
-#define SWITCH_DRIVE_TIME_LOW 1000
+#define SWITCH_DRIVE_TIME_LOW 500
 // - the pulse length for a long switching impulse. (ms)
 #define SWITCH_DRIVE_TIME_HIGH 2000
 // - the blanking time while switching signals. (ms)

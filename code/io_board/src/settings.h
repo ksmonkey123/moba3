@@ -13,6 +13,9 @@
 // - the maximum number of characters that can be consumed between logic ticks. larger values may starve the logic classes of CPU cycles
 #define NETWORK_MAX_ITERATIONS 10
 
+#define NO_UPDATE_TIMEOUT 2000
+#define UPDATE_TICK_PULSE   20
+
 // ################
 // # SPI settings #
 // ################

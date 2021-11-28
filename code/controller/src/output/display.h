@@ -21,6 +21,8 @@ namespace Display {
     void getRepetitionCommand(char* buffer);
 
     void toggleDarkmode();
+
+    void init();
 }
 
 #endif
