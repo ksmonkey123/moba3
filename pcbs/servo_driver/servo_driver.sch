@@ -40,44 +40,38 @@ Connection ~ 2000 1300
 Wire Wire Line
 	2000 1300 2000 1400
 $Comp
-L Connector:AVR-ISP-6 J3
+L Connector:AVR-ISP-6 J1
 U 1 1 608F4114
 P 4600 5050
-F 0 "J3" H 4271 5146 50  0000 R CNN
+F 0 "J1" H 4271 5146 50  0000 R CNN
 F 1 "AVR-ISP-6" H 4271 5055 50  0000 R CNN
-F 2 "Connector_PinSocket_2.54mm:PinSocket_2x03_P2.54mm_Vertical" V 4350 5100 50  0001 C CNN
+F 2 "Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical" V 4350 5100 50  0001 C CNN
 F 3 " ~" H 3325 4500 50  0001 C CNN
 	1    4600 5050
 	1    0    0    -1  
 $EndComp
-Text GLabel 4500 4550 1    50   Input ~ 0
-5V
-Text GLabel 4500 5450 3    50   Input ~ 0
-GND
 Text GLabel 5000 4850 2    50   Input ~ 0
-MISO
-Text GLabel 5000 4950 2    50   Input ~ 0
-MOSI
-Text GLabel 5000 5050 2    50   Input ~ 0
-SCK
+5V
 Text GLabel 5200 5150 2    50   Input ~ 0
+GND
+Text GLabel 4500 4550 2    50   Input ~ 0
+MISO
+Text GLabel 5000 5050 2    50   Input ~ 0
+MOSI
+Text GLabel 5000 4950 2    50   Input ~ 0
+SCK
+Text GLabel 4500 5450 2    50   Input ~ 0
 ~RST
 Wire Wire Line
 	5200 5150 5000 5150
 Text GLabel 3000 3200 2    50   Input ~ 0
 ~RST
-Wire Wire Line
-	2600 3200 2800 3200
 Text GLabel 2600 2200 2    50   Input ~ 0
 SCK
 Text GLabel 2600 2000 2    50   Input ~ 0
 MOSI
 Text GLabel 2600 2100 2    50   Input ~ 0
 MISO
-Text GLabel 2900 1800 2    50   Input ~ 0
-~OE
-Wire Wire Line
-	2900 1800 2600 1800
 $Comp
 L Device:Crystal Y1
 U 1 1 60BEF7B0
@@ -147,25 +141,18 @@ GND
 $Comp
 L Device:R R?
 U 1 1 60FC8C67
-P 2800 3050
+P 2900 3050
 AR Path="/60ED5CFC/60FC8C67" Ref="R?"  Part="1" 
-AR Path="/60FC8C67" Ref="R1"  Part="1" 
-F 0 "R1" H 2870 3096 50  0000 L CNN
-F 1 "10k" H 2870 3005 50  0000 L CNN
-F 2 "Resistor_SMD:R_0603_1608Metric" V 2730 3050 50  0001 C CNN
-F 3 "~" H 2800 3050 50  0001 C CNN
-	1    2800 3050
+AR Path="/60FC8C67" Ref="R3"  Part="1" 
+F 0 "R3" H 2970 3096 50  0000 L CNN
+F 1 "10k" H 2970 3005 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 2830 3050 50  0001 C CNN
+F 3 "~" H 2900 3050 50  0001 C CNN
+	1    2900 3050
 	1    0    0    1   
 $EndComp
-Connection ~ 2800 3200
-Wire Wire Line
-	2800 3200 3000 3200
-Text GLabel 2800 2900 1    50   Input ~ 0
+Text GLabel 2900 2900 1    50   Input ~ 0
 5V
-Text GLabel 3000 3600 2    50   Input ~ 0
-LED
-Wire Wire Line
-	3000 3600 2600 3600
 $Comp
 L Device:C C3
 U 1 1 61B21DEA
@@ -221,15 +208,15 @@ Text GLabel 4100 2700 1    50   Input ~ 0
 5V
 Text GLabel 4700 2700 1    50   Input ~ 0
 5V
-Text GLabel 2600 1900 2    50   Input ~ 0
+Text GLabel 2600 3400 2    50   Input ~ 0
 LED_A
 $Comp
 L Device:R R?
 U 1 1 61B2F99B
 P 4100 3650
 AR Path="/60ED5CFC/61B2F99B" Ref="R?"  Part="1" 
-AR Path="/61B2F99B" Ref="R2"  Part="1" 
-F 0 "R2" H 4170 3696 50  0000 L CNN
+AR Path="/61B2F99B" Ref="R1"  Part="1" 
+F 0 "R1" H 4170 3696 50  0000 L CNN
 F 1 "10k" H 4170 3605 50  0000 L CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 4030 3650 50  0001 C CNN
 F 3 "~" H 4100 3650 50  0001 C CNN
@@ -254,8 +241,8 @@ L Device:R R?
 U 1 1 61B324E9
 P 4700 3650
 AR Path="/60ED5CFC/61B324E9" Ref="R?"  Part="1" 
-AR Path="/61B324E9" Ref="R3"  Part="1" 
-F 0 "R3" H 4770 3696 50  0000 L CNN
+AR Path="/61B324E9" Ref="R2"  Part="1" 
+F 0 "R2" H 4770 3696 50  0000 L CNN
 F 1 "10k" H 4770 3605 50  0000 L CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" V 4630 3650 50  0001 C CNN
 F 3 "~" H 4700 3650 50  0001 C CNN
@@ -279,28 +266,28 @@ Text GLabel 4100 3500 1    50   Input ~ 0
 LED_A
 Text GLabel 4700 3500 1    50   Input ~ 0
 LED_B
-Text GLabel 2600 3900 2    50   Input ~ 0
+Text GLabel 2600 2700 2    50   Input ~ 0
 LED_B
 $Comp
-L Connector:Screw_Terminal_01x04 J1
+L Connector:Screw_Terminal_01x04 J2
 U 1 1 61B39B40
 P 5800 1800
-F 0 "J1" H 5880 1792 50  0000 L CNN
+F 0 "J2" H 5880 1792 50  0000 L CNN
 F 1 "Screw_Terminal_01x04" H 5880 1701 50  0000 L CNN
 F 2 "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MPT-0,5-4-2.54_1x04_P2.54mm_Horizontal" H 5800 1800 50  0001 C CNN
 F 3 "~" H 5800 1800 50  0001 C CNN
 	1    5800 1800
 	1    0    0    -1  
 $EndComp
-Text GLabel 5600 2000 0    50   Input ~ 0
+Text GLabel 5600 1800 0    50   Input ~ 0
 5V
 Text GLabel 5600 1700 0    50   Input ~ 0
 GND
 $Comp
-L Connector:Conn_01x04_Male J2
+L Connector:Conn_01x04_Male J3
 U 1 1 61B3E821
 P 5850 2450
-F 0 "J2" H 5822 2424 50  0000 R CNN
+F 0 "J3" H 5822 2424 50  0000 R CNN
 F 1 "Conn_01x04_Male" H 5822 2333 50  0000 R CNN
 F 2 "Connector_JST:JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical" H 5850 2450 50  0001 C CNN
 F 3 "~" H 5850 2450 50  0001 C CNN
@@ -311,17 +298,17 @@ Text GLabel 5650 2350 0    50   Input ~ 0
 GND
 Text GLabel 5650 2450 0    50   Input ~ 0
 5V
-Text GLabel 2600 4000 2    50   Input ~ 0
+Text GLabel 2600 2900 2    50   Input ~ 0
 servo
 Text GLabel 5650 2650 0    50   Input ~ 0
 servo
-Text GLabel 5600 1800 0    50   Input ~ 0
-sig_A
 Text GLabel 5600 1900 0    50   Input ~ 0
-sig_B
-Text GLabel 2600 3700 2    50   Input ~ 0
 sig_A
-Text GLabel 2600 3800 2    50   Input ~ 0
+Text GLabel 5600 2000 0    50   Input ~ 0
+sig_B
+Text GLabel 2600 1700 2    50   Input ~ 0
+sig_A
+Text GLabel 2600 1800 2    50   Input ~ 0
 sig_B
 Text GLabel 4450 1600 1    50   Input ~ 0
 sig_A
@@ -360,9 +347,9 @@ Wire Wire Line
 Connection ~ 4600 1900
 Text GLabel 4250 2850 2    50   Input ~ 0
 rv1
-Text GLabel 2600 2600 2    50   Input ~ 0
+Text GLabel 2600 3100 2    50   Input ~ 0
 rv1
-Text GLabel 2600 2700 2    50   Input ~ 0
+Text GLabel 2600 2800 2    50   Input ~ 0
 rv2
 Text GLabel 4850 2850 2    50   Input ~ 0
 rv2
@@ -381,6 +368,75 @@ Text GLabel 3400 3850 3    50   Input ~ 0
 GND
 Text GLabel 3400 3450 1    50   Input ~ 0
 sig_T
-Text GLabel 2600 4100 2    50   Input ~ 0
+Text GLabel 2600 3000 2    50   Input ~ 0
 sig_T
+Text Label 3000 2250 1    50   ~ 0
+XTAL1
+Text Label 2950 2400 3    50   ~ 0
+XTAL2
+Connection ~ 2900 3200
+Wire Wire Line
+	2900 3200 3000 3200
+Wire Wire Line
+	2600 3200 2900 3200
+$Comp
+L Device:C C7
+U 1 1 61BAABF2
+P 5500 3450
+F 0 "C7" H 5385 3404 50  0000 R CNN
+F 1 "100nF" H 5385 3495 50  0000 R CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 5538 3300 50  0001 C CNN
+F 3 "~" H 5500 3450 50  0001 C CNN
+	1    5500 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C8
+U 1 1 61BAC576
+P 6000 3450
+F 0 "C8" H 5885 3404 50  0000 R CNN
+F 1 "100nF" H 5885 3495 50  0000 R CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6038 3300 50  0001 C CNN
+F 3 "~" H 6000 3450 50  0001 C CNN
+	1    6000 3450
+	1    0    0    -1  
+$EndComp
+Text GLabel 5500 3300 1    50   Input ~ 0
+rv1
+Text GLabel 6000 3300 1    50   Input ~ 0
+rv2
+Text GLabel 5500 3600 3    50   Input ~ 0
+GND
+Text GLabel 6000 3600 3    50   Input ~ 0
+GND
+$Comp
+L Device:R R?
+U 1 1 61BB6636
+P 3050 4850
+AR Path="/60ED5CFC/61BB6636" Ref="R?"  Part="1" 
+AR Path="/61BB6636" Ref="R4"  Part="1" 
+F 0 "R4" H 3120 4896 50  0000 L CNN
+F 1 "10k" H 3120 4805 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 2980 4850 50  0001 C CNN
+F 3 "~" H 3050 4850 50  0001 C CNN
+	1    3050 4850
+	1    0    0    1   
+$EndComp
+$Comp
+L Device:LED LED3
+U 1 1 61BB663C
+P 3050 5150
+F 0 "LED3" V 3089 5032 50  0000 R CNN
+F 1 "LED" V 2998 5032 50  0000 R CNN
+F 2 "LED_SMD:LED_0603_1608Metric" H 3050 5150 50  0001 C CNN
+F 3 "~" H 3050 5150 50  0001 C CNN
+	1    3050 5150
+	0    -1   -1   0   
+$EndComp
+Text GLabel 3050 5300 3    50   Input ~ 0
+GND
+Text GLabel 3050 4700 1    50   Input ~ 0
+LED_C
+Text GLabel 2600 1900 2    50   Input ~ 0
+LED_C
 $EndSCHEMATC
