@@ -11,17 +11,33 @@ void setup() {
   pinMode(PIN_TOGGLE, INPUT_PULLUP);
   pinMode(PIN_TRIGGER_A, INPUT_PULLUP);
   pinMode(PIN_TRIGGER_B, INPUT_PULLUP);
+
+  digitalWrite(PIN_LED_C, true);
 }
 
-static int channel = -1;
+static int8_t channel = -1;
+unsigned long lastTick;
+
+static struct State {
+  int8_t channel = -1;
+  int data;
+} state;
 
 void tick() {
-  auto input = analogRead(channel == 0 ? PIN_CALIBRATION_A : PIN_CALIBRATION_B);
-  myservo.writeMicroseconds(988 + input);
+  boolean trigger = lastTick + 200 > millis();
+
+  if (channel != state.channel || !trigger) {
+    state.channel = channel;
+    state.data = analogRead(channel == 0 ? PIN_CALIBRATION_A : PIN_CALIBRATION_B);
+  }
+
+  digitalWrite(PIN_LED_C, trigger);
+  myservo.writeMicroseconds(988 + state.data);
 }
 
 void updateLED() {
-    myservo.attach(PIN_SERVO);
+  lastTick = millis();
+  myservo.attach(PIN_SERVO);
   if (channel == 0) {
     digitalWrite(PIN_LED_A, true);
     digitalWrite(PIN_LED_B, false);
@@ -62,5 +78,6 @@ void loop() {
   if (channel >= 0) {
     tick();
   }
+
   delay(1);
 }
