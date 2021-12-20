@@ -3,16 +3,21 @@
 
 #include "settings.h"
 
-Servo myservo;
+Servo servo;
 
 void setup() {
   pinMode(PIN_LED_A, OUTPUT);
   pinMode(PIN_LED_B, OUTPUT);
+  pinMode(PIN_LED_C, OUTPUT);
   pinMode(PIN_TOGGLE, INPUT_PULLUP);
   pinMode(PIN_TRIGGER_A, INPUT_PULLUP);
   pinMode(PIN_TRIGGER_B, INPUT_PULLUP);
-
   digitalWrite(PIN_LED_C, true);
+
+  servo.attach(PIN_SERVO);
+  servo.writeMicroseconds(1500);
+
+  delay(1000);
 }
 
 static int8_t channel = -1;
@@ -32,12 +37,11 @@ void tick() {
   }
 
   digitalWrite(PIN_LED_C, trigger);
-  myservo.writeMicroseconds(988 + state.data);
+  servo.writeMicroseconds(988 + state.data);
 }
 
 void updateLED() {
   lastTick = millis();
-  myservo.attach(PIN_SERVO);
   if (channel == 0) {
     digitalWrite(PIN_LED_A, true);
     digitalWrite(PIN_LED_B, false);
