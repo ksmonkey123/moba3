@@ -5,19 +5,27 @@
 
 Servo servo;
 
+void startLED(uint8_t led) {
+  pinMode(led, OUTPUT);
+  digitalWrite(led, true);
+}
+
 void setup() {
-  pinMode(PIN_LED_A, OUTPUT);
-  pinMode(PIN_LED_B, OUTPUT);
-  pinMode(PIN_LED_C, OUTPUT);
   pinMode(PIN_TOGGLE, INPUT_PULLUP);
   pinMode(PIN_TRIGGER_A, INPUT_PULLUP);
   pinMode(PIN_TRIGGER_B, INPUT_PULLUP);
-  digitalWrite(PIN_LED_C, true);
+
+  startLED(PIN_LED_A);
+  startLED(PIN_LED_B);
+  startLED(PIN_LED_C);
 
   servo.attach(PIN_SERVO);
   servo.writeMicroseconds(1500);
 
-  delay(1000);
+  delay(BOOT_DELAY_MS);
+  
+  digitalWrite(PIN_LED_A, false);
+  digitalWrite(PIN_LED_B, false);
 }
 
 static int8_t channel = -1;

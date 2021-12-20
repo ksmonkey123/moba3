@@ -12,3 +12,5 @@
 
 #define PIN_CALIBRATION_A A5
 #define PIN_CALIBRATION_B A2
+
+#define BOOT_DELAY_MS 500
