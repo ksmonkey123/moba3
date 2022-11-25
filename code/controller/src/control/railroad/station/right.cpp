@@ -233,6 +233,7 @@ void Station::Right::tick() {
 
     if (pressedCount == 1) {
         data.signalDirection = track < 4 ? EXIT : ENTRY;
+        async_abort(upgrade);
     }
     if (pressedCount == 2) {
         if (track >= 4 || entry < 4) {

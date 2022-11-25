@@ -5,8 +5,7 @@
 
 namespace StatusLED {
 
-    void force_on();
-    void force_off();
+    void init();
 
 }
 

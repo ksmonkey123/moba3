@@ -16,7 +16,7 @@ boolean async(void(*callback)(), uint32_t timeout) {
         }
     }
     #ifdef DEBUG_LOG
-    Serial.println("no free async slot");
+    Serial.println("# no free async slot");
     #endif
     return false;
 }
@@ -29,6 +29,11 @@ void async_abort(void(*callback)()) {
     }
 }
 
+void async_unique(void(*callback)(), uint32_t timeout) {
+    async_abort(callback);
+    async(callback, timeout);
+}
+
 void async_tick() {
     static uint32_t lastCheck = 0;
 
@@ -36,9 +41,9 @@ void async_tick() {
 
     if (time == lastCheck) {
         return;
-    } else {
-        lastCheck = time;
     }
+
+    lastCheck = time;
 
     for (byte i = 0; i < ASYNC_COUNT; i++) {
         Async* async = _asyncs + i;

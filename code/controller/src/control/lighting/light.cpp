@@ -1,5 +1,11 @@
 #include "../control_modules.h"
 
+/**
+ * WARNING: Light Decoders are 1-indexed, Light Pins are 0-indexed.
+ * Light Address 0x10 for example would be decoder 1, pin 0.
+ * decoder addresses range from 0x1* to 0x4* (theoretically up to 0x9*)
+ */
+
 static void fullUpdate();
 static void singleLightBrowser();
 

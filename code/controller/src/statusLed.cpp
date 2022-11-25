@@ -2,15 +2,9 @@
 #include "statusLedFull.h"
 #include "settings.h"
 #include "timer.h"
+#include "async.h"
 
-static void disable(Timer*) {
-    digitalWrite(LED_PIN, false);
-}
-
-static Timer* timer;
-
-static void _init() {
-    timer = Timer::create(LED_PULSE_DURATION, disable);
+void StatusLED::init() {
     pinMode(LED_PIN, OUTPUT);
 }
 
@@ -23,9 +17,6 @@ void StatusLED::force_off() {
 }
 
 void StatusLED::blink() {
-    if (timer == nullptr) {
-        _init();
-    }
-    digitalWrite(LED_PIN, true);
-    timer->start();
+    StatusLED::force_on();
+    async_unique(StatusLED::force_off, LED_PULSE_DURATION);
 }

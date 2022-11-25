@@ -7,13 +7,13 @@ static byte buffer_length;
 
 void Network::init() {
     Serial.begin(NETWORK_BAUDRATE);
-    Serial.print(F("\n----------------------\n"));
-    Serial.print(F("starting controller...\n"));
-    Serial.print(F("build date:\n"));
-    Serial.print  (F(__DATE__));
-    Serial.print  (F(" - "));
+    Serial.print(F("\n# ----------------------\n"));
+    Serial.print(F("# starting controller...\n"));
+    Serial.print(F("# build date:\n# "));
+    Serial.print(F(__DATE__));
+    Serial.print(F(" - "));
     Serial.print(F(__TIME__));
-    Serial.print(F("\n----------------------\n"));
+    Serial.print(F("\n# ----------------------\n"));
     delay(1000);
 }
 

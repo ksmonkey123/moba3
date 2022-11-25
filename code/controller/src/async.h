@@ -9,4 +9,6 @@ void async_abort(void(*callback)());
 
 void async_tick();
 
+void async_unique(void(*callback)(), uint32_t timeout);
+
 #endif
