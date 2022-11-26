@@ -10,19 +10,7 @@
 #include "timer.h"
 #include "async.h"
 
-#ifdef RS485_ENABLE
-void setupSerial() {
-    digitalWrite(RS485_ENABLE, LOW);
-    pinMode(RS485_ENABLE, OUTPUT);
-    delay(500);
-    digitalWrite(RS485_ENABLE, HIGH);
-}
-#endif
-
 void setup() {
-    #ifdef RS485_ENABLE
-    setupSerial();
-    #endif
     StatusLED::init();
     StatusLED::blink();
     delay(1000);
