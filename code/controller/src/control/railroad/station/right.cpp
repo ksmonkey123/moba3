@@ -21,6 +21,7 @@ static boolean isCrossed = false;
 
 static void resetInner();
 static void resetOuter();
+static void processSignals();
 
 static void resetInner() {
     innerPath.target = -1;
@@ -36,6 +37,7 @@ static void resetInner() {
         isCrossed = false;
         resetOuter();
     }
+    processSignals();
 }
 
 static void resetOuter() {
@@ -52,6 +54,7 @@ static void resetOuter() {
         isCrossed = false;
         resetInner();
     }
+    processSignals();
 }
 
 static boolean processSwitches(byte entry, byte track) {

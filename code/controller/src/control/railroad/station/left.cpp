@@ -13,6 +13,8 @@ static Path paths[] = {
     { .target = -1, .direction = SignalDirection::DISABLED },
     { .target = -1, .direction = SignalDirection::DISABLED }};
 
+static void processSignals();
+
 static void doReset() {
     paths[0].target = -1;
     paths[1].target = -1;
@@ -29,6 +31,7 @@ static void doReset() {
     ExitSignals::setSignal(EXIT_SIGNALS_L, 3, HALT);
     Display::set(3, 0x00, 0xff);
     Display::set(5, 0x00, 0x0f);
+    processSignals();
 }
 
 static void processSwitches(byte entry, byte track) {
