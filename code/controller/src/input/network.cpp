@@ -13,7 +13,7 @@ void setupProxyMode() {
     digitalWrite(RS485_ENABLE, LOW);
     #endif
     Serial.print(F("# type '.' for direct proxy mode...\n"));
-    delay(2000);
+    delay(1000);
     bool proxy;
     if (Serial.available() > 0 && Serial.read() == '.') {
         Serial.print(F("# entering proxy mode\n"));
@@ -38,7 +38,6 @@ void Network::init() {
     #ifdef RS485_ENABLE
         digitalWrite(RS485_ENABLE, LOW);
         pinMode(RS485_ENABLE, OUTPUT);
-        delay(500);
         digitalWrite(RS485_ENABLE, HIGH);
     #endif
     Serial.begin(NETWORK_BAUDRATE);

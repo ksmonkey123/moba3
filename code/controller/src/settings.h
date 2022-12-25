@@ -38,7 +38,7 @@
 #define NETWORK_TIMER_PERIOD           100 // [us]
 #define DARKMODE_TIMEOUT           1000000 // [us]
 #define SWITCH_STAGGERING_PERIOD    100    // [ms]
-#define SIGNAL_UPGRADE_DELAY       1000    // [ms]
+#define SIGNAL_UPGRADE_DELAY        500    // [ms]
 #define COMMAND_REPETITION_PERIOD  1000    // [ms]
 #define LIGHT_STAGGERING_PERIOD      10    // [ms]
 
