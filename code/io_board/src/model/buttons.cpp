@@ -1,12 +1,20 @@
+#include "Arduino.h"
 #include "buttons.h"
 #include "../networking/eventHandler.h"
 #include "../statusLed.h"
+#include "../settings.h"
 
 static uint16_t states[4][3];
 static uint16_t last_composites[4];
 static byte sample_count;
+static unsigned long last_sample_time;
 
 void Buttons::update(uint16_t* buffer) {
+  unsigned long current_millis = micros();
+  if ((current_millis - last_sample_time) < BUTTON_SAMPLING_RATE) {
+    return;
+  }
+
     for (byte i = 0; i < 4; i++) {
       // record samples
       states[i][sample_count] = buffer[i];

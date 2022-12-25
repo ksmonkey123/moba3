@@ -24,6 +24,9 @@
 #define OUTPUT_ENABLE_PIN 9
 #define INPUT_LATCH_PIN 8
 
+// - sampling rate of buttons. board needs 3 samples. sampling rate provided as microseconds.
+#define BUTTON_SAMPLING_RATE 500
+
 #define INPUT_CHANNELS {A0,A1,A2,A3}
 
 #define LED_PIN 2
