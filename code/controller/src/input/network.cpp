@@ -2,6 +2,7 @@
 #include "network.h"
 #include "buttons.h"
 #include "../directProxy.h"
+#include "../output/debugLog.h"
 
 static char buffer[3];
 static byte buffer_length;
@@ -13,15 +14,23 @@ void setupProxyMode() {
     digitalWrite(RS485_ENABLE, LOW);
     #endif
     Serial.print(F("# type '.' for direct proxy mode...\n"));
+    Serial.print(F("# type ',' for debug log...\n"));
     delay(1000);
-    bool proxy;
-    if (Serial.available() > 0 && Serial.read() == '.') {
+    bool proxy = false;
+    if (Serial.available() > 0) {
+      int in = Serial.read();
+      if (in == '.') {
         Serial.print(F("# entering proxy mode\n"));
         proxy = true;
-    } else {
+      } else {
+        if (in == ',') {
+          Serial.print(F("# enabled debug log\n"));
+          DebugLog::enabled = true;
+        }
         Serial.print(F("# resuming normal startup\n"));
-        proxy = false;
+      }
     }
+    // consume remaining chars
     while(Serial.available() > 0) {
         Serial.read();
     }

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "writer.h"
 
+#include "debugLog.h"
 #include "switches.h"
 #include "entrySignals.h"
 #include "exitSignals.h"
@@ -17,13 +18,15 @@ void Writer::init() {
     Timer::create(NETWORK_TIMER_PERIOD, tick)->start();
 }
 
-static char buffer[20];
+// 20 chars in buffer are usable, the last char is reserved for a fixed NULL char to prevent buffer overflow.
+static char buffer[21];
 static byte index;
 
 typedef void(*CommandProvider)(char*);
 
 static CommandProvider commandProviders[] = {
     // normal commands
+    DebugLog::getNextCommand,
     Switches::getNextCommand,
     EntrySignals::getNextCommand,
     ExitSignals::getNextCommand,

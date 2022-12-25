@@ -4,6 +4,7 @@
 #include "../utils.h"
 #include "../output/switches.h"
 #include "../async.h"
+#include "../output/debugLog.h"
 
 /** a single 16-bit button sector */
 struct ButtonSector {
@@ -29,6 +30,16 @@ static void disablePulsed() {
 }
 
 void Buttons::processInput(char* buffer) {
+  if (DebugLog::enabled) {
+    char logline[5];
+    logline[0] = '#';
+    logline[1] = buffer[0];
+    logline[2] = buffer[1];
+    logline[3] = buffer[2];
+    logline[4] = '\n';
+    DebugLog::append(logline, 1);
+  }
+
     if (buffer[0] == 'X' && buffer[1] == 'X' && buffer[2] == 'X') {
         Serial.println("RESET");
         Buttons::init();
