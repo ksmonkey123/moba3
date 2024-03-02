@@ -28,4 +28,6 @@
 
 #define LED_PIN 2
 
+#define DEBOUNCE_STEPS 5
+
 #endif
